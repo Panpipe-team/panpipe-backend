@@ -1,16 +1,14 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-COPY *.sln .
-COPY Panpipe/*.csproj ./Panpipe/
-RUN dotnet restore ./Panpipe/Panpipe.csproj
+COPY src/Panpipe.WebApi/*.csproj ./Panpipe.WebApi/
+RUN dotnet restore ./Panpipe.WebApi/
 
-COPY . .
-WORKDIR /src/Panpipe
-RUN dotnet publish -c Release -o /app
+COPY src/Panpipe.WebApi/ ./Panpipe.WebApi/
+RUN dotnet publish -c Release -o /app ./Panpipe.WebApi/
 
 
 FROM mcr.microsoft.com/dotnet/aspnet:8.0  AS final
 WORKDIR /app
 COPY --from=build /app ./
-ENTRYPOINT [ "dotnet", "Panpipe.dll" ]
+ENTRYPOINT [ "dotnet", "Panpipe.WebApi.dll" ]
