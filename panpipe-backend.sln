@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.002.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Panpipe", "Panpipe\Panpipe.csproj", "{D0C3B945-5E2F-4D70-AE9D-9CFC129F3950}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PanpipeTests", "PanpipeTests\PanpipeTests.csproj", "{B3A517CC-9119-4EDC-AF11-1887A359DB79}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D0C3B945-5E2F-4D70-AE9D-9CFC129F3950}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D0C3B945-5E2F-4D70-AE9D-9CFC129F3950}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D0C3B945-5E2F-4D70-AE9D-9CFC129F3950}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D0C3B945-5E2F-4D70-AE9D-9CFC129F3950}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B3A517CC-9119-4EDC-AF11-1887A359DB79}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B3A517CC-9119-4EDC-AF11-1887A359DB79}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B3A517CC-9119-4EDC-AF11-1887A359DB79}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B3A517CC-9119-4EDC-AF11-1887A359DB79}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {0081F4D3-E4D4-40F5-B2BC-77A252F633DF}
+	EndGlobalSection
+EndGlobal
