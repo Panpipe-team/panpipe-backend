@@ -1,0 +1,9 @@
+services:
+  web:
+    image: ghcr.io/panpipe-team/panpipe-backend/web-api:latest
+    build: 
+      context: .
+      target: final
+    pull_policy: never
+    ports:
+      - ${WEB_API_PORT:-8080}:8080
