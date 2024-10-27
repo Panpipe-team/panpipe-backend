@@ -14,10 +14,10 @@ jobs:
         runs-on: ubuntu-latest
 
         steps:
-            - uses: actions/checkout@v3
+            - uses: actions/checkout@v4.2.2
 
             - name: Login to Github Registry 🔐
-              uses: docker/login-action@v2
+              uses: docker/login-action@v3.3.0
               with:
                 registry: ${{ env.CONTAINER_REGISTRY }}
                 username: ${{ github.actor }}
@@ -34,7 +34,7 @@ jobs:
         runs-on: ubuntu-latest
 
         steps:
-            - uses: actions/checkout@v3
+            - uses: actions/checkout@v4.2.2
 
             - name: Create .env file 🤫
               run: |
@@ -46,7 +46,7 @@ jobs:
                 echo "WEB_API_PORT=${{ secrets.WEB_API_PORT }}" > .env
 
             - name: Copy docker-compose and .env files to server via scp 📥
-              uses: appleboy/scp-action@v0.1.3
+              uses: appleboy/scp-action@v0.1.7
               with:
                 host: ${{ secrets.SSH_HOST }}
                 username: ${{ secrets.SSH_USERNAME }}
@@ -56,7 +56,7 @@ jobs:
                 target: "${{ secrets.REMOTE_APP_DIRECTORY }}/new-files"
             
             - name: Reup docker compose via ssh 🔄
-              uses: appleboy/ssh-action@v0.1.5
+              uses: appleboy/ssh-action@v1.0.3
               env:
                 GHCR_USERNAME: ${{ github.actor }}
                 GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
