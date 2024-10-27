@@ -14,6 +14,6 @@ public class HelloWorldControllerTest
         var result = controller.Get();
 
         // Assert
-        Assert.Equal("Hello, world!", result);
+        Assert.Equal("Hello, world! V2", result);
     }
 }
