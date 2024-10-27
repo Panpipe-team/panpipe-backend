@@ -1,6 +1,6 @@
 services:
   web:
-    image: ghcr.io/panpipe-team/panpipe-backend/web-api:latest
+    image: ${CONTAINER_REGISTRY:-ghcr.io}/${IMAGE_NAME:-wrong-image-name-here}:latest
     build: 
       context: .
       target: final
