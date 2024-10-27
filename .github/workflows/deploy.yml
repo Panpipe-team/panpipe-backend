@@ -66,6 +66,7 @@ jobs:
                 username: ${{ secrets.SSH_USERNAME }}
                 port: ${{ secrets.SSH_PORT }}
                 key: ${{ secrets.SSH_KEY }}
+                envs: GHCR_USERNAME,GHCR_TOKEN,REMOTE_APP_DIRECTORY
                 script: |
                   cd $REMOTE_APP_DIRECTORY
                   docker compose down
