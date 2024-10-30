@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 
-namespace Panpipe.Controllers;
+namespace Panpipe.WebApi.Controllers;
 
 
 [ApiController]
