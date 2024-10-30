@@ -1,6 +1,6 @@
-using Panpipe.WebApi.Controllers;
+using Panpipe.Controllers;
 
-namespace Panpipe.WebApi.Tests;
+namespace Panpipe.Controllers.Tests;
 
 public class HelloWorldControllerTest
 {
