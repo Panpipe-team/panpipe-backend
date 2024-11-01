@@ -25,6 +25,6 @@ public class GroupIndividualHabit : Habit
         Group = group;
         HabitType = HabitType.GroupIndividual;
     }
-    public virtual User User { get; set; }
-    public virtual Group Group { get; set; }
+    public virtual required User User { get; set; }
+    public virtual required Group Group { get; set; }
 }

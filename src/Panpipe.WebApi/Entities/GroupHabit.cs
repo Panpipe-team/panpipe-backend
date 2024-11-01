@@ -24,5 +24,5 @@ public class GroupHabit : Habit
         HabitType = HabitType.GroupShared;
     }
 
-    public virtual Group Group { get; set; }
+    public virtual required Group Group { get; set; }
 }

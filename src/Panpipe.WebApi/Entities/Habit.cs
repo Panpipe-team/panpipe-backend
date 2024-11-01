@@ -22,7 +22,7 @@ public abstract class Habit
 
     public Guid Id { get; set; }
 
-    public string Name { get; set; }
+    public required string Name { get; set; }
 
     public HabitType HabitType { get; set; }
 
@@ -30,9 +30,9 @@ public abstract class Habit
 
     public HabitResultType HabitResultType { get; set; }
 
-    public string Goal { get; set; }
+    public required string Goal { get; set; }
 
-    public Frequency Frequency { get; set; }
+    public required Frequency Frequency { get; set; }
 
     public virtual ICollection<Result> Results { get; set; } = new List<Result>();
 }

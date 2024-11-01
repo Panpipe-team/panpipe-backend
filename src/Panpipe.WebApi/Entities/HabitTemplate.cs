@@ -22,13 +22,13 @@ public class HabitTemplate
 
     public Guid Id { get; set; }
 
-    public string Name { get; set; }
+    public required string Name { get; set; }
 
     public string? Description { get; set; }
 
     public HabitResultType HabitResultType { get; set; }
 
-    public string GoalData { get; set; }
+    public required string GoalData { get; set; }
 
-    public Frequency Frequency { get; set; }
+    public required Frequency Frequency { get; set; }
 }

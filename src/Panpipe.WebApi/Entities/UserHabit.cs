@@ -23,5 +23,5 @@ public class UserHabit : Habit
         User = user;
         HabitType = HabitType.Personal;
     }
-    public virtual User User { get; set; }
+    public virtual required User User { get; set; }
 }
