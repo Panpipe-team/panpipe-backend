@@ -23,7 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="../Panpipe.WebApi/Panpipe.WebApi.csproj" />
+    <ProjectReference Include="../../src/Panpipe.Controllers/Panpipe.Controllers.csproj" />
   </ItemGroup>
 
 </Project>

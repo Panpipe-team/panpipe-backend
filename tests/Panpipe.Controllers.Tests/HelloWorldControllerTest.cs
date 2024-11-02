@@ -1,6 +1,6 @@
 using Panpipe.Controllers;
 
-namespace PanpipeTests;
+namespace Panpipe.Controllers.Tests;
 
 public class HelloWorldControllerTest
 {
