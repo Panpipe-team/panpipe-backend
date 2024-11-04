@@ -11,7 +11,7 @@ public class Group
     public Guid Id { get; set; }
     public required string Name { get; set; }
 
-    public virtual ICollection<User> Members { get; set; } = new List<User>();
+    public virtual ICollection<Account> Members { get; set; } = new List<Account>();
 
     public virtual ICollection<Habit> Habits { get; set; } = new List<Habit>();
 }

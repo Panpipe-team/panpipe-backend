@@ -10,7 +10,7 @@ public class GroupIndividualHabit : Habit
         HabitResultType habitResultType,
         string goal,
         Frequency frequency,
-        User user,
+        Account account,
         Group group,
         string? description = null)
         : base(
@@ -21,10 +21,10 @@ public class GroupIndividualHabit : Habit
             frequency,
             description)
     {
-        User = user;
+        Account = account;
         Group = group;
         HabitType = HabitType.GroupIndividual;
     }
-    public virtual required User User { get; set; }
+    public virtual required Account Account { get; set; }
     public virtual required Group Group { get; set; }
 }

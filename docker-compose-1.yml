@@ -1,0 +1,30 @@
+services:
+  mainDb:
+    image: postgres:16.2
+    environment:
+      POSTGRES_DB: "Main"
+      POSTGRES_USER: "USer11"
+      POSTGRES_PASSWORD: "Pssa24345#$%"
+      PGDATA: "/var/lib/postgresql/data/pgdata"
+    ports:
+      - 9110:5432
+  
+  webapi:
+    build:
+      context: .
+      dockerfile: ./src/Panpipe.WebApi/Dockerfile
+    
+    environment:
+      ASPNETCORE_URLS: http://+:80
+      ConnectionStrings__MainDb: '
+            Host=mainDb;
+            Port=5432;
+            Database=Main;
+            Username=USer11;
+            Password=Pssa24345#$%;
+            '
+    ports:
+      - 8080:80
+    
+    depends_on:
+      - mainDb
