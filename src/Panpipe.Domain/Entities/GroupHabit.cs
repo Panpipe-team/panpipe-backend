@@ -1,5 +1,4 @@
-namespace Panpipe.WebApi.Entities;
-
+namespace Panpipe.Domain.Entities;
 public class GroupHabit : Habit
 {
     public GroupHabit() { }

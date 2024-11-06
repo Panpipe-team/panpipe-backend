@@ -1,4 +1,4 @@
-namespace Panpipe.WebApi.Entities;
+namespace Panpipe.Domain.Entities;
 
 public class User
 {
