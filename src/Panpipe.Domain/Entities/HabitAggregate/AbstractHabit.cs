@@ -2,14 +2,14 @@ using Panpipe.Domain.Interfaces;
 
 namespace Panpipe.Domain.Entities.HabitAggregate;
 
-public abstract class Habit<T>: AggregateRoot where T: IHabitResultType
+public abstract class AbstractHabit<T>: AggregateRoot where T: IHabitResultType
 {
     private readonly List<HabitMark<T>> habitMarks = new();
 
     #pragma warning disable CS8618 // Required by Entity Framework
-    private Habit() {}
+    private AbstractHabit() {}
 
-    public Habit(Guid id, Guid paramsId) 
+    public AbstractHabit(Guid id, Guid paramsId) 
     {
         Id = id;
         ParamsId = paramsId;
