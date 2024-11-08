@@ -4,6 +4,7 @@ WORKDIR /src
 COPY src/Panpipe.Domain/*.csproj ./Panpipe.Domain/
 COPY src/Panpipe.Services/*.csproj ./Panpipe.Services/
 COPY src/Panpipe.Controllers/*.csproj ./Panpipe.Controllers/
+COPY src/Panpipe.Common/*.csproj ./Panpipe.Common
 COPY src/Panpipe.Infrastructure/*.csproj ./Panpipe.Infrastructure/
 COPY src/Panpipe.WebApi/*.csproj ./Panpipe.WebApi/
 RUN dotnet restore ./Panpipe.WebApi/
