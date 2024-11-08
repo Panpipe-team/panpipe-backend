@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 
-namespace Panpipe.Controllers;
-
+namespace Panpipe.Presentation.Controllers;
 
 [ApiController]
 [Route("/api/hello-world")]

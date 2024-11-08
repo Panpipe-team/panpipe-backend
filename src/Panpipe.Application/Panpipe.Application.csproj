@@ -4,10 +4,6 @@
     <ProjectReference Include="..\Panpipe.Domain\Panpipe.Domain.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Ardalis.Specification" Version="8.0.0" />
-  </ItemGroup>
-
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
