@@ -2,7 +2,7 @@ using Panpipe.Domain.Interfaces;
 
 namespace Panpipe.Domain.Entities.HabitParamsAggregate;
 
-public class HabitParams<T>: AggregateRoot where T: IHabitResultType 
+public class HabitParams<T>: AggregateRoot, IHabitParams where T: IHabitResultType 
 {
     #pragma warning disable CS8618 // Required by Entity Framework
     private HabitParams() {}
@@ -34,7 +34,7 @@ public class HabitParams<T>: AggregateRoot where T: IHabitResultType
     public List<DateTimeOffset> CalculateTimestampsOfEmptyMarksForNewlyCreatedHabit() 
         => Periodicity.CalculateTimestampsOfEmptyMarksForNewlyCreatedHabit();
 
-    public void CaluclateTimestampsOfEmptyMarksForExistingHabitFromLastMarkTimestamp
+    public List<DateTimeOffset> CaluclateTimestampsOfEmptyMarksForExistingHabitFromLastMarkTimestamp
     (
         DateTimeOffset lastMarkTimestamp
     ) 

@@ -2,7 +2,7 @@ using Panpipe.Domain.Interfaces;
 
 namespace Panpipe.Domain.Entities.HabitAggregate;
 
-public abstract class AbstractHabit<T>: AggregateRoot where T: IHabitResultType
+public abstract class AbstractHabit<T>: AggregateRoot, IHabit where T: IHabitResultType
 {
     private readonly List<HabitMark<T>> habitMarks = new();
 
