@@ -1,3 +1,3 @@
 namespace Panpipe.Domain.Interfaces;
 
-public interface IAggregateRoot { }
+public interface IHabitResultType {}
