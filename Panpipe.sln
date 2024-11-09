@@ -15,8 +15,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Panpipe.Common", "src\Panpi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Panpipe.Domain", "src\Panpipe.Domain\Panpipe.Domain.csproj", "{874F371E-478A-4709-9150-5EB62F9DB0AB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Panpipe.Infrastructure", "src\Panpipe.Infrastructure\Panpipe.Infrastructure.csproj", "{6D110853-DE0F-4DF8-A31C-607281FD1A9E}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Panpipe.Persistence", "src\Panpipe.Persistence\Panpipe.Persistence.csproj", "{C76007A0-EE22-404C-918A-AB74D15E3606}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Panpipe.Presentation", "src\Panpipe.Presentation\Panpipe.Presentation.csproj", "{29E71724-9318-40C6-9DA8-8A7F9492F037}"
@@ -43,10 +41,6 @@ Global
 		{874F371E-478A-4709-9150-5EB62F9DB0AB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{874F371E-478A-4709-9150-5EB62F9DB0AB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{874F371E-478A-4709-9150-5EB62F9DB0AB}.Release|Any CPU.Build.0 = Release|Any CPU
-		{6D110853-DE0F-4DF8-A31C-607281FD1A9E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6D110853-DE0F-4DF8-A31C-607281FD1A9E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6D110853-DE0F-4DF8-A31C-607281FD1A9E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6D110853-DE0F-4DF8-A31C-607281FD1A9E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C76007A0-EE22-404C-918A-AB74D15E3606}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C76007A0-EE22-404C-918A-AB74D15E3606}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C76007A0-EE22-404C-918A-AB74D15E3606}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -59,16 +53,15 @@ Global
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
-	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {0081F4D3-E4D4-40F5-B2BC-77A252F633DF}
-	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{D359BAFC-88F2-4386-9858-9A083D7F4B67} = {3C23775B-81F4-4AFC-8DC7-9192007486AF}
 		{FCFDE8BA-0565-42EC-83AE-35A0621B79CB} = {0DF67C8F-B0FE-4946-AD4D-4162559B483C}
 		{B93A4AB8-434B-4600-9187-50F4C50EEABE} = {0DF67C8F-B0FE-4946-AD4D-4162559B483C}
 		{874F371E-478A-4709-9150-5EB62F9DB0AB} = {0DF67C8F-B0FE-4946-AD4D-4162559B483C}
-		{6D110853-DE0F-4DF8-A31C-607281FD1A9E} = {0DF67C8F-B0FE-4946-AD4D-4162559B483C}
 		{C76007A0-EE22-404C-918A-AB74D15E3606} = {0DF67C8F-B0FE-4946-AD4D-4162559B483C}
 		{29E71724-9318-40C6-9DA8-8A7F9492F037} = {0DF67C8F-B0FE-4946-AD4D-4162559B483C}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {0081F4D3-E4D4-40F5-B2BC-77A252F633DF}
 	EndGlobalSection
 EndGlobal

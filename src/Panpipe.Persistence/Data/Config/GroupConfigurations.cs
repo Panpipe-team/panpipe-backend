@@ -9,8 +9,14 @@ public class GroupConfigurations : IEntityTypeConfiguration<Group>
     public void Configure(EntityTypeBuilder<Group> builder)
     {
         builder
-            // .HasKey(group => group.Id)
             .Property(group => group.Name)
             .IsRequired();
+        
+        builder
+            .Property(group => group.UserIds)
+            .HasConversion(
+                v => v.Select(guid => guid.ToString()),
+                v => v.Select(Guid.Parse).ToList()
+            );
     }
 }

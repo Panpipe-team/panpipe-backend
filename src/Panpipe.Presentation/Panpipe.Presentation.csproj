@@ -13,7 +13,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Panpipe.Application\Panpipe.Application.csproj" />
-    <ProjectReference Include="..\Panpipe.Infrastructure\Panpipe.Infrastructure.csproj" />
     <ProjectReference Include="..\Panpipe.Persistence\Panpipe.Persistence.csproj" />
   </ItemGroup>
 

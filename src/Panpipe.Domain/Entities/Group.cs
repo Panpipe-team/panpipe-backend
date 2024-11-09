@@ -2,11 +2,11 @@ namespace Panpipe.Domain.Entities;
 
 public class Group: AggregateRoot
 {
-    private readonly List<Guid> userIds = new();
+    private readonly List<Guid> userIds = new List<Guid>();
 
     public Guid Id { get; private set;}
     public string Name { get; private set; }
-    public IReadOnlyList<Guid> UserIds => userIds.AsReadOnly();
+    public IEnumerable<Guid> UserIds => userIds.AsReadOnly();
 
     private Group() {}
 
