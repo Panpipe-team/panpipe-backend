@@ -19,4 +19,9 @@ public class HabitMark<T> where T: IHabitResultType
     {
         return new HabitMark<T>(id, timestamp, null);
     }
+
+    public void ChangeResult(T value) 
+    {
+        Result = new HabitMarkResult<T>(value);
+    }
 }

@@ -8,5 +8,5 @@ public class HabitMarkResult<T> where T: IHabitResultType
         Value = value;
     }
 
-    public T Value { get; private set; }
+    public T Value { get; }
 }

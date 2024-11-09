@@ -32,4 +32,12 @@ public abstract class AbstractHabit<T>: AggregateRoot, IHabit where T: IHabitRes
 
         habitMarks.Add(HabitMark<T>.CreateEmpty(markId, timestamp));
     }
+
+    public void ChangeResult(Guid markId, T result) 
+    {
+        var mark = habitMarks.FirstOrDefault(habitMark => habitMark.Id == markId) 
+            ?? throw new InvalidOperationException($"Cannot change habit result: no mark with id {markId}");
+
+        mark.ChangeResult(result);
+    }
 }
