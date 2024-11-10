@@ -3,7 +3,6 @@ using Panpipe.Application.Interfaces;
 using Panpipe.Persistence.Data;
 using Panpipe.Persistence;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.OpenApi.Models;
 using Panpipe.Persistence.Identity;
 
 var builder = WebApplication.CreateBuilder(args);

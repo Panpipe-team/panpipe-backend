@@ -9,7 +9,6 @@ using Panpipe.Presentation.Requests;
 using Ardalis.Result;
 using Panpipe.Presentation.Responses;
 using Microsoft.AspNetCore.Authorization;
-using Panpipe.Domain.Entities;
 using Panpipe.Application.Queries.GetGroups;
 
 namespace Panpipe.Presentation.Controllers;

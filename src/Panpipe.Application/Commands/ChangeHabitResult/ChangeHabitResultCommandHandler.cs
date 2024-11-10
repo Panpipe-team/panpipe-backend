@@ -28,7 +28,12 @@ public class ChangeHabitResultCommandHandler<T> : IRequestHandler<ChangeHabitRes
             return Result.NotFound($"Habit with id {request.HabitId} was not found");
         }
         
-        habit.ChangeResult(request.MarkId, request.Value);
+        try {
+            habit.ChangeResult(request.MarkId, request.Value);
+        }
+        catch (InvalidOperationException) {
+            return Result.NotFound($"Mark with id {request.MarkId} was not found");
+        }
 
         await _habitRepository.UpdateAsync(habit, cancellationToken);
 
