@@ -45,6 +45,8 @@ builder.Services.ConfigureApplicationCookie(options =>{
 
 var app = builder.Build();
 
+SeedDatabase(app);
+
 app.UseAuthentication();
 app.UseAuthorization();
 
@@ -54,3 +56,19 @@ app.UseSwaggerUI();
 app.MapControllers();
 
 app.Run();
+
+static async void SeedDatabase(WebApplication app)
+{
+    using var scope = app.Services.CreateScope();
+
+    var scopedProvider = scope.ServiceProvider;
+    try
+    {
+        var appDbContext = app.Services.GetRequiredService<ApplicationDbContext>();
+        await ApplicationDbContextSeed.SeedAsync(appDbContext);
+    }
+    catch (Exception ex)
+    {
+        app.Logger.LogError(ex, "An error occurred seeding the DB.");
+    }
+}
