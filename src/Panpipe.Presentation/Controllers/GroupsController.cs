@@ -38,7 +38,7 @@ public class GroupsController: ControllerBase {
 
     [HttpGet]
     [Authorize]
-    public async Task<ActionResult<List<GetGroupsResponseGroup>>> GetAllByUser()
+    public async Task<ActionResult<GetGroupsResponse>> GetAllByUser()
     {
         var user = await _userManager.GetUserAsync(User);
 
@@ -50,9 +50,9 @@ public class GroupsController: ControllerBase {
         var command = new GetGroupsQuery(user.Id);
         var result = await _mediator.Send(command);
 
-        return result.Map(groups => new List<GetGroupsResponseGroup>(
+        return result.Map(groups => new GetGroupsResponse(new List<GetGroupsResponseGroup>(
             groups.Select(group => new GetGroupsResponseGroup(group.Id, group.Name))
-        )).ToActionResult(this);
+        ))).ToActionResult(this);
     }
 
     [HttpPost]

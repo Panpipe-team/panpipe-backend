@@ -1,6 +1,11 @@
 namespace Panpipe.Presentation.Responses;
 
-public class GetHabitsResponse(
+public class GetHabitsResponse(List<GetHabitsResponseHabit> habits) 
+{
+    public List<GetHabitsResponseHabit> Habits { get; } = habits;
+}
+
+public class GetHabitsResponseHabit(
     Guid templateId, string name, string periodicity, string goal, string resultType
 ): BaseResponse
 {
