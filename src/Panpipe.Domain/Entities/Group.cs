@@ -8,6 +8,7 @@ public class Group: AggregateRoot
     public string Name { get; private set; }
     public IEnumerable<Guid> UserIds => userIds.AsReadOnly();
 
+    #pragma warning disable CS8618 // Required by Entity Framework
     private Group() {}
 
     public Group(Guid id, string name, Guid userId)

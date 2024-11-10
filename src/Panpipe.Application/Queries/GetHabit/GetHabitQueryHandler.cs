@@ -7,21 +7,21 @@ using Panpipe.Domain.Interfaces;
 
 namespace Panpipe.Application.Queries.GetHabit;
 
-public class GetHabitQueryHandler<T> : IRequestHandler<GetHabitQuery<T>, Result<AbstractHabit<T>>>
+public class GetHabitQueryHandler<T> : IRequestHandler<GetHabitQuery<T>, Result<Habit<T>>>
     where T : IHabitResultType
 {
-    private readonly IReadRepository<AbstractHabit<T>> _habitRepository;
+    private readonly IReadRepository<Habit<T>> _habitRepository;
 
-    public GetHabitQueryHandler(IReadRepository<AbstractHabit<T>> habitRepository)
+    public GetHabitQueryHandler(IReadRepository<Habit<T>> habitRepository)
     {
         _habitRepository = habitRepository;
     }
 
-    public async Task<Result<AbstractHabit<T>>> Handle(GetHabitQuery<T> request, CancellationToken cancellationToken)
+    public async Task<Result<Habit<T>>> Handle(GetHabitQuery<T> request, CancellationToken cancellationToken)
     {
         var spec = new HabitWithMarksSpecification<T>(request.HabitId);
 
-        var result = await _habitRepository.FirstOrDefaultAsync(spec);
+        var result = await _habitRepository.FirstOrDefaultAsync(spec, cancellationToken);
 
         if (result is null)
         {

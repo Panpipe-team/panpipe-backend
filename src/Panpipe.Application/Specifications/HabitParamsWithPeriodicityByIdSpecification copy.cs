@@ -4,9 +4,9 @@ using Panpipe.Domain.Interfaces;
 
 namespace Panpipe.Application.Specifications;
 
-public class HabitParamsWithPeriodicitySpecification<T>: Specification<HabitParams<T>> where T: IHabitResultType
+public class HabitParamsWithPeriodicityByIdSpecification<T>: Specification<HabitParams<T>> where T: IHabitResultType
 {
-    public HabitParamsWithPeriodicitySpecification(Guid id)
+    public HabitParamsWithPeriodicityByIdSpecification(Guid id)
     {
         Query
             .Where(habitParams => habitParams.Id == id)

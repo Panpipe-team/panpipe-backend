@@ -4,7 +4,7 @@ using Panpipe.Domain.Interfaces;
 
 namespace Panpipe.Application.Specifications;
 
-public class HabitWithMarksSpecification<T>: Specification<AbstractHabit<T>> where T: IHabitResultType
+public class HabitWithMarksSpecification<T>: Specification<Habit<T>> where T: IHabitResultType
 {
     public HabitWithMarksSpecification(Guid habitId)
     {

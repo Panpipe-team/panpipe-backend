@@ -23,6 +23,9 @@ builder.Services.AddAuthorization();
 builder.Services.AddControllers();
 
 builder.Services.AddEndpointsApiExplorer();
+
+builder.Services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
+
 builder.Services.AddSwaggerGen();
 
 // Bug fix: API Endpoint with AuthorizeAttribute returns 404 on Unauthorized

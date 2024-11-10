@@ -9,12 +9,12 @@ using Panpipe.Presentation.Responses;
 namespace Panpipe.Presentation.Controllers;
 
 [ApiController]
-[Route("/api/v1/users")]
-public class UserController: ControllerBase
+[Route("/api/v1/[controller]")]
+public class UsersController: ControllerBase
 {
     private readonly UserManager<AppIdentityUser> _userManager;
 
-    public UserController(UserManager<AppIdentityUser> userManager)
+    public UsersController(UserManager<AppIdentityUser> userManager)
     {
         _userManager = userManager;
     }

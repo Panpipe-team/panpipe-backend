@@ -10,9 +10,9 @@ namespace Panpipe.Application.Commands.ChangeHabitResult;
 public class ChangeHabitResultCommandHandler<T> : IRequestHandler<ChangeHabitResultCommand<T>, Result> 
     where T : IHabitResultType
 {
-    private readonly IRepository<AbstractHabit<T>> _habitRepository;
+    private readonly IRepository<Habit<T>> _habitRepository;
 
-    public ChangeHabitResultCommandHandler(IRepository<AbstractHabit<T>> habitRepository)
+    public ChangeHabitResultCommandHandler(IRepository<Habit<T>> habitRepository)
     {
         _habitRepository = habitRepository;
     }

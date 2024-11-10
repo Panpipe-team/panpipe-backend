@@ -1,6 +1,6 @@
 namespace Panpipe.Domain.Interfaces;
 
-public interface IHabitResultType 
+public interface IHabitOwner
 {
     
 }

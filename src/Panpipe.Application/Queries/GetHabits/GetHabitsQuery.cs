@@ -5,4 +5,4 @@ using Panpipe.Domain.Interfaces;
 
 namespace Panpipe.Application.Queries.GetHabits;
 
-public record GetHabitsQuery<T>(Guid UserId): IRequest<Result<List<AbstractHabit<T>>>> where T: IHabitResultType;
+public record GetHabitsQuery<T>(Guid UserId): IRequest<Result<List<Habit<T>>>> where T: IHabitResultType;

@@ -14,12 +14,12 @@ using Panpipe.Application.Queries.GetGroups;
 namespace Panpipe.Presentation.Controllers;
 
 [ApiController]
-[Route("/api/v1/groups")]
-public class GroupController: ControllerBase {
+[Route("/api/v1/[controller]")]
+public class GroupsController: ControllerBase {
     private readonly UserManager<AppIdentityUser> _userManager;
     private readonly IMediator _mediator;
 
-    public GroupController(IMediator mediator, UserManager<AppIdentityUser> userManager) 
+    public GroupsController(IMediator mediator, UserManager<AppIdentityUser> userManager) 
     {
         _mediator = mediator;
         _userManager = userManager;

@@ -1,23 +1,28 @@
 using Ardalis.Result;
 using MediatR;
 using Panpipe.Application.Interfaces;
+using Panpipe.Application.Specifications;
 using Panpipe.Domain.Entities.HabitAggregate;
 using Panpipe.Domain.Interfaces;
 
 namespace Panpipe.Application.Queries.GetHabits;
 
-public class GetHabitsQueryHandler<T> : IRequestHandler<GetHabitsQuery<T>, Result<List<AbstractHabit<T>>>>
+public class GetHabitsQueryHandler<T> : IRequestHandler<GetHabitsQuery<T>, Result<List<Habit<T>>>>
     where T : IHabitResultType
 {
-    private readonly IReadRepository<AbstractHabit<T>> _habitRepository;
+    private readonly IReadRepository<Habit<T>> _habitRepository;
 
-    public GetHabitsQueryHandler(IReadRepository<AbstractHabit<T>> habitRepository)
+    public GetHabitsQueryHandler(IReadRepository<Habit<T>> habitRepository)
     {
         _habitRepository = habitRepository;
     }
     
-    public Task<Result<List<AbstractHabit<T>>>> Handle(GetHabitsQuery<T> request, CancellationToken cancellationToken)
+    public async Task<Result<List<Habit<T>>>> Handle(GetHabitsQuery<T> request, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        var spec = new HabitsWithoutMarksByUserIdSpecification<T>(request.UserId);
+
+        var result = await _habitRepository.ListAsync(spec, cancellationToken);
+
+        return Result.Success(result);
     }
 }

@@ -2,23 +2,25 @@ using Panpipe.Domain.Interfaces;
 
 namespace Panpipe.Domain.Entities.HabitAggregate;
 
-public abstract class AbstractHabit<T>: AggregateRoot, IHabit where T: IHabitResultType
+public class Habit<T>: AggregateRoot, IHabit where T: IHabitResultType
 {
     private readonly List<HabitMark<T>> habitMarks = new();
 
     #pragma warning disable CS8618 // Required by Entity Framework
-    private AbstractHabit() {}
+    private Habit() {}
 
-    public AbstractHabit(Guid id, Guid paramsId) 
+    public Habit(Guid id, Guid paramsId, IHabitOwner habitOwner) 
     {
         Id = id;
         ParamsId = paramsId;
+        HabitOwner = habitOwner;
     }
 
     public IReadOnlyList<HabitMark<T>> HabitMarks => habitMarks.AsReadOnly();
 
     public Guid Id { get; }
     public Guid ParamsId { get; }
+    public IHabitOwner HabitOwner { get;}
 
     public void AddEmptyMark(Guid markId, DateTimeOffset timestamp) 
     {

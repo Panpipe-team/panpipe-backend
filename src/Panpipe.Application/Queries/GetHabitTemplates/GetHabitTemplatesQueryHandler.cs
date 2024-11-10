@@ -1,6 +1,7 @@
 using Ardalis.Result;
 using MediatR;
 using Panpipe.Application.Interfaces;
+using Panpipe.Application.Specifications;
 using Panpipe.Domain.Entities.HabitParamsAggregate;
 using Panpipe.Domain.Interfaces;
 
@@ -16,8 +17,12 @@ public class GetHabitTemplatesQueryHandler<T> : IRequestHandler<GetHabitTemplate
         _habitParamsRepository = habitParamsRepository;
     }
     
-    public Task<Result<List<HabitParams<T>>>> Handle(GetHabitTemplatesQuery<T> request, CancellationToken cancellationToken)
+    public async Task<Result<List<HabitParams<T>>>> Handle(GetHabitTemplatesQuery<T> request, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        var spec = new HabitParamsPublicTemplatesSpecification<T>();
+
+        var result = await _habitParamsRepository.ListAsync(spec, cancellationToken);
+
+        return Result.Success(result);
     }
 }

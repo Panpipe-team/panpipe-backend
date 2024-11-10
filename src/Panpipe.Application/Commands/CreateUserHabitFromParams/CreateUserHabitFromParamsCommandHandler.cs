@@ -13,12 +13,12 @@ public class CreateUserHabitFromParamsCommandHandler<T> :
     IRequestHandler<CreateUserHabitFromParamsCommand<T>, Result>
     where T : IHabitResultType
 {
-    private readonly IRepository<AbstractHabit<T>> _habitRepository;
+    private readonly IRepository<Habit<T>> _habitRepository;
     private readonly IReadRepository<HabitParams<T>> _habitParamsRepository;
 
     public CreateUserHabitFromParamsCommandHandler
     (
-        IRepository<AbstractHabit<T>> habitRepository, 
+        IRepository<Habit<T>> habitRepository, 
         IReadRepository<HabitParams<T>> habitParamsRepository
     )
     {
@@ -28,7 +28,7 @@ public class CreateUserHabitFromParamsCommandHandler<T> :
 
     public async Task<Result> Handle(CreateUserHabitFromParamsCommand<T> request, CancellationToken cancellationToken)
     {
-        var habitParamsSpecification = new HabitParamsWithPeriodicitySpecification<T>(request.HabitParamsId);
+        var habitParamsSpecification = new HabitParamsWithPeriodicityByIdSpecification<T>(request.HabitParamsId);
         var habitParams = await _habitParamsRepository.FirstOrDefaultAsync(habitParamsSpecification, cancellationToken);
 
         if (habitParams is null)
@@ -36,7 +36,8 @@ public class CreateUserHabitFromParamsCommandHandler<T> :
             return Result.NotFound($"Habit params with id {request.HabitParamsId} was not found");
         }
 
-        var habit = new UserHabit<T>(Guid.NewGuid(), request.HabitParamsId, request.UserId);
+        var userHabitOwner = new UserHabitOwner(request.UserId);
+        var habit = new Habit<T>(Guid.NewGuid(), request.HabitParamsId, userHabitOwner);
 
         HabitService.AddEmptyMarksToNewlyCreatedHabit(habit, habitParams);
 
