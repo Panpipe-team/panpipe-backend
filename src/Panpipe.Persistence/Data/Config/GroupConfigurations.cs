@@ -9,14 +9,13 @@ public class GroupConfigurations : IEntityTypeConfiguration<Group>
     public void Configure(EntityTypeBuilder<Group> builder)
     {
         builder
-            .Property(group => group.Name)
-            .IsRequired();
+            .Property(group => group.Name);
         
         builder
-            .Property(group => group.UserIds)
-            .HasConversion(
-                v => v.Select(guid => guid.ToString()),
-                v => v.Select(Guid.Parse).ToList()
-            );
+            .Property(group => group.UserIds);
+            // .HasConversion(
+            //     v => v.Select(guid => guid.ToString()),
+            //     v => v.Select(Guid.Parse).ToList()
+            // );
     }
 }

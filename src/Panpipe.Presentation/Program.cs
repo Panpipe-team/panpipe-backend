@@ -64,7 +64,7 @@ static async void SeedDatabase(WebApplication app)
     var scopedProvider = scope.ServiceProvider;
     try
     {
-        var appDbContext = app.Services.GetRequiredService<ApplicationDbContext>();
+        var appDbContext = scopedProvider.GetRequiredService<ApplicationDbContext>();
         await ApplicationDbContextSeed.SeedAsync(appDbContext);
     }
     catch (Exception ex)

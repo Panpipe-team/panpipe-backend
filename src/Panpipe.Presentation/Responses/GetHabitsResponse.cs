@@ -6,10 +6,10 @@ public class GetHabitsResponse(List<GetHabitsResponseHabit> habits)
 }
 
 public class GetHabitsResponseHabit(
-    Guid templateId, string name, string periodicity, string goal, string resultType
+    Guid habitId, string name, string periodicity, string goal, string resultType
 ): BaseResponse
 {
-    public Guid TemplateId { get; } = templateId;
+    public Guid HabitId { get; } = habitId;
     public string Name { get; } = name;
     public string Periodicity { get; } = periodicity;
     public string Goal { get; } = goal;

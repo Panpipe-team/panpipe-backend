@@ -15,6 +15,7 @@ namespace Panpipe.Presentation.Controllers;
 
 [ApiController]
 [Route("/api/v1/[controller]")]
+[Authorize]
 public class GroupsController: ControllerBase {
     private readonly UserManager<AppIdentityUser> _userManager;
     private readonly IMediator _mediator;
@@ -27,7 +28,6 @@ public class GroupsController: ControllerBase {
 
     [HttpGet]
     [Route("{id:Guid}")]
-    [Authorize]
     public async Task<ActionResult<GetGroupResponse>> GetById([FromRoute] Guid id) 
     {
         var command = new GetGroupQuery(id);
@@ -37,7 +37,6 @@ public class GroupsController: ControllerBase {
     }
 
     [HttpGet]
-    [Authorize]
     public async Task<ActionResult<GetGroupsResponse>> GetAllByUser()
     {
         var user = await _userManager.GetUserAsync(User);
@@ -56,7 +55,6 @@ public class GroupsController: ControllerBase {
     }
 
     [HttpPost]
-    [Authorize]
     public async Task<ActionResult<CreateGroupResponse>> Create([FromBody] CreateGroupRequest request) 
     {
         var user = await _userManager.GetUserAsync(User);

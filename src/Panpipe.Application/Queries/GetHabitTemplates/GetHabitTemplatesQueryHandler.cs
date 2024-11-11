@@ -3,23 +3,21 @@ using MediatR;
 using Panpipe.Application.Interfaces;
 using Panpipe.Application.Specifications;
 using Panpipe.Domain.Entities.HabitParamsAggregate;
-using Panpipe.Domain.Interfaces;
 
 namespace Panpipe.Application.Queries.GetHabitTemplates;
 
-public class GetHabitTemplatesQueryHandler<T> : IRequestHandler<GetHabitTemplatesQuery<T>, Result<List<HabitParams<T>>>>
-    where T : IHabitResultType
+public class GetHabitTemplatesQueryHandler : IRequestHandler<GetHabitTemplatesQuery, Result<List<HabitParams>>>
 {
-    private readonly IReadRepository<HabitParams<T>> _habitParamsRepository;
+    private readonly IReadRepository<HabitParams> _habitParamsRepository;
 
-    public GetHabitTemplatesQueryHandler(IReadRepository<HabitParams<T>> habitParamsRepository)
+    public GetHabitTemplatesQueryHandler(IReadRepository<HabitParams> habitParamsRepository)
     {
         _habitParamsRepository = habitParamsRepository;
     }
     
-    public async Task<Result<List<HabitParams<T>>>> Handle(GetHabitTemplatesQuery<T> request, CancellationToken cancellationToken)
+    public async Task<Result<List<HabitParams>>> Handle(GetHabitTemplatesQuery request, CancellationToken cancellationToken)
     {
-        var spec = new HabitParamsPublicTemplatesSpecification<T>();
+        var spec = new HabitParamsPublicTemplatesSpecification();
 
         var result = await _habitParamsRepository.ListAsync(spec, cancellationToken);
 

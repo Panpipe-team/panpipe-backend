@@ -1,8 +1,8 @@
 using Ardalis.Result;
 using MediatR;
 using Panpipe.Domain.Entities.HabitAggregate;
-using Panpipe.Domain.Interfaces;
+using Panpipe.Domain.Entities.HabitParamsAggregate;
 
 namespace Panpipe.Application.Queries.GetHabit;
 
-public record GetHabitQuery<T>(Guid HabitId): IRequest<Result<Habit<T>>> where T: IHabitResultType;
+public record GetHabitQuery(Guid HabitId): IRequest<Result<Tuple<Habit, HabitParams>>>;

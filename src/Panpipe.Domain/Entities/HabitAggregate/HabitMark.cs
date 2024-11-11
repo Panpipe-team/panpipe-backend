@@ -2,9 +2,9 @@ using Panpipe.Domain.Interfaces;
 
 namespace Panpipe.Domain.Entities.HabitAggregate;
 
-public class HabitMark<T> where T: IHabitResultType
+public class HabitMark
 {
-    private HabitMark(Guid id, DateTimeOffset timestamp, HabitMarkResult<T>? result) 
+    private HabitMark(Guid id, DateTimeOffset timestamp, IHabitResult? result) 
     {
         Id = id;
         Timestamp = timestamp;
@@ -13,15 +13,24 @@ public class HabitMark<T> where T: IHabitResultType
 
     public Guid Id { get; }
     public DateTimeOffset Timestamp { get;}
-    public HabitMarkResult<T>? Result { get; private set; }
+    public IHabitResult? Result { get; private set; }
 
-    public static HabitMark<T> CreateEmpty(Guid id, DateTimeOffset timestamp)
+    public static HabitMark CreateEmpty(Guid id, DateTimeOffset timestamp)
     {
-        return new HabitMark<T>(id, timestamp, null);
+        return new HabitMark(id, timestamp, null);
     }
 
-    public void ChangeResult(T value) 
+    public void ChangeResult(IHabitResult value) 
     {
-        Result = new HabitMarkResult<T>(value);
+        if (Result is IHabitResult oldValue && oldValue.Type != value.Type)
+        {
+            throw new InvalidOperationException
+            (
+                "Trying to change HabitMark value with type that differs from the old one: " +
+                $"old type: {oldValue.Type}, new type: {value.Type}"
+            );
+        }
+
+        Result = value;
     }
 }

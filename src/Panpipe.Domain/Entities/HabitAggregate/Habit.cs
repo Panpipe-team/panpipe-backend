@@ -2,25 +2,23 @@ using Panpipe.Domain.Interfaces;
 
 namespace Panpipe.Domain.Entities.HabitAggregate;
 
-public class Habit<T>: AggregateRoot, IHabit where T: IHabitResultType
+public class Habit: AggregateRoot
 {
-    private readonly List<HabitMark<T>> habitMarks = new();
+    private readonly List<HabitMark> habitMarks = new();
 
     #pragma warning disable CS8618 // Required by Entity Framework
     private Habit() {}
 
-    public Habit(Guid id, Guid paramsId, IHabitOwner habitOwner) 
+    public Habit(Guid id, Guid paramsId) 
     {
         Id = id;
         ParamsId = paramsId;
-        HabitOwner = habitOwner;
     }
 
-    public IReadOnlyList<HabitMark<T>> HabitMarks => habitMarks.AsReadOnly();
+    public IReadOnlyList<HabitMark> HabitMarks => habitMarks.AsReadOnly();
 
     public Guid Id { get; }
     public Guid ParamsId { get; }
-    public IHabitOwner HabitOwner { get;}
 
     public void AddEmptyMark(Guid markId, DateTimeOffset timestamp) 
     {
@@ -32,10 +30,10 @@ public class Habit<T>: AggregateRoot, IHabit where T: IHabitResultType
             );
         }
 
-        habitMarks.Add(HabitMark<T>.CreateEmpty(markId, timestamp));
+        habitMarks.Add(HabitMark.CreateEmpty(markId, timestamp));
     }
 
-    public void ChangeResult(Guid markId, T result) 
+    public void ChangeResult(Guid markId, IHabitResult result) 
     {
         var mark = habitMarks.FirstOrDefault(habitMark => habitMark.Id == markId) 
             ?? throw new InvalidOperationException($"Cannot change habit result: no mark with id {markId}");

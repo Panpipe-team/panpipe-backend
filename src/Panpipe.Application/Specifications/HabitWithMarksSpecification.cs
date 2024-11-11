@@ -1,15 +1,15 @@
 using Ardalis.Specification;
 using Panpipe.Domain.Entities.HabitAggregate;
-using Panpipe.Domain.Interfaces;
 
 namespace Panpipe.Application.Specifications;
 
-public class HabitWithMarksSpecification<T>: Specification<Habit<T>> where T: IHabitResultType
+public class HabitWithMarksSpecification: Specification<Habit>
 {
     public HabitWithMarksSpecification(Guid habitId)
     {
         Query
             .Where(habit => habit.Id == habitId)
-            .Include(habit => habit.HabitMarks);
+            .Include(habit => habit.HabitMarks)
+                .ThenInclude(habitMark => habitMark.Result);
     }
 }

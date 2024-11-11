@@ -8,7 +8,7 @@ public abstract class AggregateRoot
 
     public IReadOnlyList<IDomainEvent> DomainEvents => domainEvents.AsReadOnly();
 
-    protected void RaiseDomainEvent(IDomainEvent domainEvent) => domainEvents.Add(domainEvent);
+    public void RaiseDomainEvent(IDomainEvent domainEvent) => domainEvents.Add(domainEvent);
 
     public void ClearDomainEvents() => domainEvents.Clear();
 }

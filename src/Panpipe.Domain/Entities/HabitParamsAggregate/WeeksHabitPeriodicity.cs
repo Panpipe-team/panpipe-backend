@@ -7,7 +7,7 @@ public class WeeksHabitPeriodicity : AbstractHabitPeriodicity
     private static readonly int DaysInWeek = 7;
 
     public WeeksHabitPeriodicity(int intervalValue): base(intervalValue) {}
-     
+
     protected override int KeepMarksAheadAmount => 2;
 
     protected override DateTimeOffset GetCurrentMarkTimestamp()
