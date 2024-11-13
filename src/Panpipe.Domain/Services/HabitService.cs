@@ -1,6 +1,6 @@
 using Panpipe.Domain.Entities.HabitAggregate;
 using Panpipe.Domain.Entities.HabitParamsAggregate;
-using Panpipe.Domain.Interfaces;
+using Panpipe.Domain.Entities.HabitResults;
 
 namespace Panpipe.Domain.Services;
 
@@ -18,7 +18,7 @@ public static class HabitService
         }
     }
 
-    public static void ChangeHabitResult(Habit habit, HabitParams habitParams, IHabitResult result, Guid markId)
+    public static void ChangeHabitResult(Habit habit, HabitParams habitParams, AbstractHabitResult result, Guid markId)
     {
         ValidateHabitParamsRelateToHabit(habit, habitParams);
 

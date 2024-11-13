@@ -1,11 +1,10 @@
 using Panpipe.Domain.Entities.HabitParamsAggregate;
-using Panpipe.Domain.Interfaces;
 
 namespace Panpipe.Presentation.Helpers;
 
 public static class PeriodicityExtensions
 {
-    public static string GetReadable(this IHabitPeriodicity periodicity)
+    public static string GetReadable(this AbstractHabitPeriodicity periodicity)
     {
         return periodicity switch
         {

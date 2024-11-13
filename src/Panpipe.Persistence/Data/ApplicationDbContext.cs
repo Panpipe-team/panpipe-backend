@@ -1,5 +1,6 @@
 using System.Reflection;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Panpipe.Domain.Entities;
 using Panpipe.Domain.Entities.HabitAggregate;
 using Panpipe.Domain.Entities.HabitOwnerAggregate;
@@ -19,14 +20,12 @@ public class ApplicationDbContext: DbContext
     public DbSet<HabitResultInt> HabitResultInts { get; set; }
     public DbSet<HabitResultTime> HabitResultTimes { get; set; }    
     public DbSet<HabitParams> HabitParams { get; set; }
+    public DbSet<DaysHabitPeriodicity> DaysHabitPeriodicities { get; set; }
+    public DbSet<WeeksHabitPeriodicity> WeeksHabitPeriodicities { get; set; }
+    public DbSet<MonthsHabitPeriodicity> MonthsHabitPeriodicities { get; set; }
     public DbSet<UserHabitOwner> UserHabitOwners { get; set; }
     public DbSet<Group> Groups { get; set;}
 
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-        base.OnConfiguring(optionsBuilder);
-        optionsBuilder.EnableSensitiveDataLogging();
-    }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);

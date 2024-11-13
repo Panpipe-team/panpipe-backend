@@ -1,17 +1,9 @@
-using Panpipe.Domain.Interfaces;
-
 namespace Panpipe.Domain.Entities.HabitParamsAggregate;
 
-public abstract class AbstractHabitPeriodicity: IHabitPeriodicity
+public abstract record AbstractHabitPeriodicity(Guid Id, int IntervalValue)
 {
-    public AbstractHabitPeriodicity(int intervalValue) 
-    {
-        IntervalValue = intervalValue;
-    }
-
+    public abstract HabitPeriodicityType Type { get; }
     protected abstract int KeepMarksAheadAmount { get; }
-
-    public int IntervalValue { get; }
 
     public List<DateTimeOffset> CalculateTimestampsOfEmptyMarksForNewlyCreatedHabit() 
     {

@@ -9,6 +9,7 @@ public class HabitParamsSpecification: Specification<HabitParams>
     {
         Query
             .Where(habitParams => habitParams.Id == id)
-            .Include(habitParams => habitParams.Goal);
+            .Include(habitParams => habitParams.Goal)
+            .Include(habitParams => habitParams.Periodicity);
     }
 }

@@ -1,5 +1,4 @@
 using Panpipe.Domain.Entities.HabitResults;
-using Panpipe.Domain.Interfaces;
 
 namespace Panpipe.Domain.Entities.HabitParamsAggregate;
 
@@ -12,8 +11,8 @@ public class HabitParams: AggregateRoot
     (
         Guid id, 
         string name, 
-        IHabitPeriodicity periodicity, 
-        IHabitResult goal, 
+        AbstractHabitPeriodicity periodicity, 
+        AbstractHabitResult goal, 
         bool isPublicTemplate
     ): this() 
     {
@@ -24,15 +23,15 @@ public class HabitParams: AggregateRoot
         IsPublicTemplate = isPublicTemplate;
     }
 
-    public Guid Id { get; }
+    public Guid Id { get; init; }
     public string Name { get; private set;}
-    public IHabitPeriodicity Periodicity { get; private set; }
-    public IHabitResult Goal { get; private set; }
-    public bool IsPublicTemplate { get; }
+    public AbstractHabitPeriodicity Periodicity { get; private set; }
+    public AbstractHabitResult Goal { get; private set; }
+    public bool IsPublicTemplate { get; init; }
 
     public HabitResultType ResultType => Goal.Type;
 
-    public bool HasSameResultType(IHabitResult result) => ResultType == result.Type;
+    public bool HasSameResultType(AbstractHabitResult result) => ResultType == result.Type;
 
     public List<DateTimeOffset> CalculateTimestampsOfEmptyMarksForNewlyCreatedHabit() 
         => Periodicity.CalculateTimestampsOfEmptyMarksForNewlyCreatedHabit();

@@ -13,8 +13,8 @@ public class ApplicationDbContextSeed
                 new (
                     Guid.NewGuid(),
                     "Выпивать воду, литров",
-                    new DaysHabitPeriodicity(1),
-                    new HabitResultFloat(2.5f),
+                    new DaysHabitPeriodicity(Guid.NewGuid(), 1),
+                    new HabitResultFloat(Guid.NewGuid(), 2.5f),
                     true
                 )
             }

@@ -12,10 +12,10 @@ public class GroupConfigurations : IEntityTypeConfiguration<Group>
             .Property(group => group.Name);
         
         builder
-            .Property(group => group.UserIds);
-            // .HasConversion(
-            //     v => v.Select(guid => guid.ToString()),
-            //     v => v.Select(Guid.Parse).ToList()
-            // );
+            .Property(group => group.UserIds)
+            .HasConversion(
+                v => v.Select(guid => guid.ToString()),
+                v => v.Select(Guid.Parse).ToList()
+            );
     }
 }

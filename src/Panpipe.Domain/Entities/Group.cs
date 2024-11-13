@@ -4,9 +4,9 @@ public class Group: AggregateRoot
 {
     private readonly List<Guid> userIds = new List<Guid>();
 
-    public Guid Id { get; private set;}
+    public Guid Id { get; init; }
     public string Name { get; private set; }
-    public IEnumerable<Guid> UserIds => userIds.AsReadOnly();
+    public ICollection<Guid> UserIds => userIds.AsReadOnly();
 
     #pragma warning disable CS8618 // Required by Entity Framework
     private Group() {}

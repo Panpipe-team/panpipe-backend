@@ -1,11 +1,10 @@
 using Panpipe.Domain.Entities.HabitResults;
-using Panpipe.Domain.Interfaces;
 
 namespace Panpipe.Presentation.Helpers;
 
 public static class HabitResultExtensions
 {
-    public static string GetReadableValue(this IHabitResult habitResult)
+    public static string GetReadableValue(this AbstractHabitResult habitResult)
     {
         return habitResult switch 
         {

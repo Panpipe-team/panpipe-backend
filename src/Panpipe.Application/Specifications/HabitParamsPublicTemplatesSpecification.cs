@@ -9,6 +9,7 @@ public class HabitParamsPublicTemplatesSpecification: Specification<HabitParams>
     {
         Query
             .Where(habitParams => habitParams.IsPublicTemplate)
-            .Include(habitParams => habitParams.Goal);
+            .Include(habitParams => habitParams.Goal)
+            .Include(habitParams => habitParams.Periodicity);
     }
 }

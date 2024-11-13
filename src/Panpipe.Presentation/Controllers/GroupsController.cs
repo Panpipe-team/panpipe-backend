@@ -43,7 +43,7 @@ public class GroupsController: ControllerBase {
 
         if (user is null)
         {
-            return Result.CriticalError("Cannot find authorized user by claim").ToActionResult(this);
+            return Result.Unauthorized("Cannot find authorized user by claim").ToActionResult(this);
         }
 
         var command = new GetGroupsQuery(user.Id);
@@ -61,7 +61,7 @@ public class GroupsController: ControllerBase {
 
         if (user is null)
         {
-            return Result.CriticalError("Cannot find authorized user by claim").ToActionResult(this);
+            return Result.Unauthorized("Cannot find authorized user by claim").ToActionResult(this);
         }
 
         var command = new CreateGroupCommand(user.Id, request.Name);

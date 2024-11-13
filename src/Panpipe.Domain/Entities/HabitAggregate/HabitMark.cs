@@ -1,28 +1,30 @@
-using Panpipe.Domain.Interfaces;
+using Panpipe.Domain.Entities.HabitResults;
 
 namespace Panpipe.Domain.Entities.HabitAggregate;
 
 public class HabitMark
 {
-    private HabitMark(Guid id, DateTimeOffset timestamp, IHabitResult? result) 
+    private HabitMark() { }
+
+    private HabitMark(Guid id, DateTimeOffset timestamp, AbstractHabitResult? result) 
     {
         Id = id;
         Timestamp = timestamp;
         Result = result;
     }
 
-    public Guid Id { get; }
-    public DateTimeOffset Timestamp { get;}
-    public IHabitResult? Result { get; private set; }
+    public Guid Id { get; init; }
+    public DateTimeOffset Timestamp { get; init;}
+    public AbstractHabitResult? Result { get; private set; }
 
     public static HabitMark CreateEmpty(Guid id, DateTimeOffset timestamp)
     {
         return new HabitMark(id, timestamp, null);
     }
 
-    public void ChangeResult(IHabitResult value) 
+    public void ChangeResult(AbstractHabitResult value) 
     {
-        if (Result is IHabitResult oldValue && oldValue.Type != value.Type)
+        if (Result is AbstractHabitResult oldValue && oldValue.Type != value.Type)
         {
             throw new InvalidOperationException
             (

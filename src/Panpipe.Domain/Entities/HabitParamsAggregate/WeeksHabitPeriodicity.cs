@@ -2,12 +2,11 @@ using Panpipe.Common.DateTime;
 
 namespace Panpipe.Domain.Entities.HabitParamsAggregate;
 
-public class WeeksHabitPeriodicity : AbstractHabitPeriodicity
+public record WeeksHabitPeriodicity(Guid Id, int IntervalValue): AbstractHabitPeriodicity(Id, IntervalValue)
 {
-    private static readonly int DaysInWeek = 7;
+    private const int DaysInWeek = 7;
 
-    public WeeksHabitPeriodicity(int intervalValue): base(intervalValue) {}
-
+    public override HabitPeriodicityType Type => HabitPeriodicityType.Weeks;
     protected override int KeepMarksAheadAmount => 2;
 
     protected override DateTimeOffset GetCurrentMarkTimestamp()

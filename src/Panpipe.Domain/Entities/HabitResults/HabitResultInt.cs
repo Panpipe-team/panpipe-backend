@@ -1,6 +1,6 @@
 namespace Panpipe.Domain.Entities.HabitResults;
 
-public record HabitResultInt(int Value) : AbstractHabitResult<int>(Value)
+public record HabitResultInt(Guid Id, int Value) : AbstractHabitResult(Id)
 {
     public override HabitResultType Type => HabitResultType.Int;
 }

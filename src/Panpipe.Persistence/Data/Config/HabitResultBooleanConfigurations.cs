@@ -8,6 +8,7 @@ public class HabitResultBooleanConfigurations : IEntityTypeConfiguration<HabitRe
 {
     public void Configure(EntityTypeBuilder<HabitResultBoolean> builder)
     {
-        
+        builder
+            .Property(habitResult => habitResult.Value);
     }
 }

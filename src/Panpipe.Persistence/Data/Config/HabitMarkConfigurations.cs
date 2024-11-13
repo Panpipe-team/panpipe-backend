@@ -8,6 +8,13 @@ public class HabitMarkConfigurations : IEntityTypeConfiguration<HabitMark>
 {
     public void Configure(EntityTypeBuilder<HabitMark> builder)
     {
+        builder
+            .Property(habitMark => habitMark.Timestamp);
         
+        builder
+            .HasOne(habitMark => habitMark.Result)
+            .WithOne()
+            .HasForeignKey<HabitMark>("ResultId")
+            .IsRequired(false);
     }
 }

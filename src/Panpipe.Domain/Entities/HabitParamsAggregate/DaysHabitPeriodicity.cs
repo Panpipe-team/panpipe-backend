@@ -2,10 +2,9 @@ using Panpipe.Common.DateTime;
 
 namespace Panpipe.Domain.Entities.HabitParamsAggregate;
 
-public class DaysHabitPeriodicity : AbstractHabitPeriodicity
+public record DaysHabitPeriodicity(Guid Id, int IntervalValue) : AbstractHabitPeriodicity(Id, IntervalValue)
 {
-    public DaysHabitPeriodicity(int intervalValue) : base(intervalValue) {}
-
+    public override HabitPeriodicityType Type => HabitPeriodicityType.Days;
     protected override int KeepMarksAheadAmount => 5;
 
     protected override DateTimeOffset GetCurrentMarkTimestamp() => DateTimeOffsetHelper.GetTodaysMidnightUtc();

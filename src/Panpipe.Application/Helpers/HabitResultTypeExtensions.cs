@@ -5,7 +5,7 @@ namespace Panpipe.Application.Helpers;
 
 public static class HabitResultTypeExtensions
 {
-    public static bool TryParse(this HabitResultType habitResultType, string s, out IHabitResult result)
+    public static bool TryParse(this HabitResultType habitResultType, string s, out AbstractHabitResult result)
     {
         return habitResultType switch 
         {
@@ -17,66 +17,68 @@ public static class HabitResultTypeExtensions
         };
     }
 
-    private static bool TryParseBool(string s, out IHabitResult result)
+    private static bool TryParseBool(string s, out AbstractHabitResult result)
     {
         var isSuccessful = bool.TryParse(s, out var tmp);
 
         if (!isSuccessful)
         {
-            result = new HabitResultBoolean(false); // Undefined hardcoded value
+            result = new HabitResultBoolean(Guid.NewGuid(), false); // Undefined hardcoded value
 
             return false;
         }
 
-        result = new HabitResultBoolean(tmp);
+        result = new HabitResultBoolean(Guid.NewGuid(), tmp);
 
         return true;
     }
 
-    private static bool TryParseInt(string s, out IHabitResult result)
+    private static bool TryParseInt(string s, out AbstractHabitResult result)
     {
         var isSuccessful = int.TryParse(s, out var tmp);
 
         if (!isSuccessful)
         {
-            result = new HabitResultInt(0); // Undefined hardcoded value
+            result = new HabitResultInt(Guid.NewGuid(), 0); // Undefined hardcoded value
 
             return false;
         }
 
-        result = new HabitResultInt(tmp);
+        result = new HabitResultInt(Guid.NewGuid(), tmp);
 
         return true;
     }
 
-    private static bool TryParseFloat(string s, out IHabitResult result)
+    private static bool TryParseFloat(string s, out AbstractHabitResult result)
     {
         var isSuccessful = float.TryParse(s, out var tmp);
 
         if (!isSuccessful)
         {
-            result = new HabitResultFloat(0); // Undefined hardcoded value
+            result = new HabitResultFloat(Guid.NewGuid(), 0); // Undefined hardcoded value
 
             return false;
         }
 
-        result = new HabitResultFloat(tmp);
+        result = new HabitResultFloat(Guid.NewGuid(), tmp);
 
         return true;
     }
 
-    private static bool TryParseTime(string s, out IHabitResult result)
+    private static bool TryParseTime(string s, out AbstractHabitResult result)
     {
         var isSuccessful = TimeOnly.TryParse(s, out var tmp);
 
         if (!isSuccessful)
         {
-            result = new HabitResultTime(TimeOnly.FromDateTime(DateTime.UtcNow)); // Undefined hardcoded value
+            result = new HabitResultTime(
+                Guid.NewGuid(), TimeOnly.FromDateTime(DateTime.UtcNow)
+            ); // Undefined hardcoded value
 
             return false;
         }
 
-        result = new HabitResultTime(tmp);
+        result = new HabitResultTime(Guid.NewGuid(), tmp);
 
         return true;
     }

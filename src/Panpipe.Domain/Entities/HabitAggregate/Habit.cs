@@ -1,4 +1,4 @@
-using Panpipe.Domain.Interfaces;
+using Panpipe.Domain.Entities.HabitResults;
 
 namespace Panpipe.Domain.Entities.HabitAggregate;
 
@@ -17,8 +17,8 @@ public class Habit: AggregateRoot
 
     public IReadOnlyList<HabitMark> HabitMarks => habitMarks.AsReadOnly();
 
-    public Guid Id { get; }
-    public Guid ParamsId { get; }
+    public Guid Id { get; init; }
+    public Guid ParamsId { get; init; }
 
     public void AddEmptyMark(Guid markId, DateTimeOffset timestamp) 
     {
@@ -33,7 +33,7 @@ public class Habit: AggregateRoot
         habitMarks.Add(HabitMark.CreateEmpty(markId, timestamp));
     }
 
-    public void ChangeResult(Guid markId, IHabitResult result) 
+    public void ChangeResult(Guid markId, AbstractHabitResult result) 
     {
         var mark = habitMarks.FirstOrDefault(habitMark => habitMark.Id == markId) 
             ?? throw new InvalidOperationException($"Cannot change habit result: no mark with id {markId}");

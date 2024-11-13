@@ -1,6 +1,6 @@
 namespace Panpipe.Domain.Entities.HabitResults;
 
-public record HabitResultBoolean(bool Value) : AbstractHabitResult<bool>(Value)
+public record HabitResultBoolean(Guid Id, bool Value): AbstractHabitResult(Id)
 {
     public override HabitResultType Type => HabitResultType.Boolean;
 }

@@ -2,12 +2,11 @@ using Panpipe.Common.DateTime;
 
 namespace Panpipe.Domain.Entities.HabitParamsAggregate;
 
-public class MonthsHabitPeriodicity : AbstractHabitPeriodicity
+public record MonthsHabitPeriodicity(Guid Id, int IntervalValue) : AbstractHabitPeriodicity(Id, IntervalValue)
 {
-    public MonthsHabitPeriodicity(int intervalValue): base(intervalValue) {}
-
+    public override HabitPeriodicityType Type => HabitPeriodicityType.Months;
     protected override int KeepMarksAheadAmount => 1;
-
+    
     protected override DateTimeOffset GetCurrentMarkTimestamp() 
     {
         var nowUtc = DateTimeOffset.UtcNow;

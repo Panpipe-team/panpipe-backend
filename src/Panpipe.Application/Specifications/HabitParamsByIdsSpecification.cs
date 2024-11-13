@@ -8,6 +8,8 @@ public class HabitParamsByIdsSpecification: Specification<HabitParams>
     public HabitParamsByIdsSpecification(List<Guid> ids)
     {
         Query
-            .Where(habitParams => ids.Contains(habitParams.Id));
+            .Where(habitParams => ids.Contains(habitParams.Id))
+            .Include(habitParams => habitParams.Goal)
+            .Include(habitParams => habitParams.Periodicity);
     }
 }

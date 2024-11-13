@@ -80,7 +80,7 @@ public class HabitsController: ControllerBase
 
         if (user is null)
         {
-            return Result.CriticalError("Cannot find authorized user by claim").ToActionResult(this);
+            return Result.Unauthorized("Cannot find authorized user by claim").ToActionResult(this);
         }
 
         var query = new GetHabitsQuery(user.Id);
@@ -104,7 +104,7 @@ public class HabitsController: ControllerBase
 
         if (user is null)
         {
-            return Result.CriticalError("Cannot find authorized user by claim").ToActionResult(this);
+            return Result.Unauthorized("Cannot find authorized user by claim").ToActionResult(this);
         }
 
         var command = new CreateUserHabitFromParamsCommand(user.Id, request.TemplateId);
