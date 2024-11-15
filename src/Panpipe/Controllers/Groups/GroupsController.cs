@@ -30,13 +30,13 @@ public class GroupsController(AppDbContext dbContext) : ControllerBase
             return Result.NotFound();
         }
 
-        return new GetGroupResponse(
+        return Result.Success(new GetGroupResponse(
             group.Name, group.UserIds.Select(userId => new GetGroupResponseParticipant(userId)).ToList()
-        );
+        ));
     }
 
     [HttpGet]
-    public async Task<GetGroupsResponse> GetGroups()
+    public async Task<Result<GetGroupsResponse>> GetGroups()
     {
         var userId = Guid.Empty;
 
@@ -45,11 +45,13 @@ public class GroupsController(AppDbContext dbContext) : ControllerBase
             .Where(group => group.UserIds.Contains(userId))
             .ToListAsync();
 
-        return new GetGroupsResponse(groups.Select(group => new GetGroupsResponseGroup(group.Id, group.Name)).ToList());
+        return Result.Success(
+            new GetGroupsResponse(groups.Select(group => new GetGroupsResponseGroup(group.Id, group.Name)).ToList())
+        );
     }
 
     [HttpPost]
-    public async Task<CreateGroupResponse> CreateGroup([FromBody] CreateGroupRequest request)
+    public async Task<Result<CreateGroupResponse>> CreateGroup([FromBody] CreateGroupRequest request)
     {
         var userId = Guid.Empty;
 
@@ -58,6 +60,6 @@ public class GroupsController(AppDbContext dbContext) : ControllerBase
         _dbContext.Groups.Add(group);
         await _dbContext.SaveChangesAsync();
 
-        return new CreateGroupResponse(group.Id);
+        return Result.Created(new CreateGroupResponse(group.Id));
     }
 }

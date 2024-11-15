@@ -16,6 +16,13 @@ public static class AppDbContextSeed
                     new FloatHabitResult(Guid.NewGuid(), 2.5f),
                     new Frequency(IntervalType.Day, 1),
                     true
+                ),
+                new (
+                    Guid.NewGuid(),
+                    "Отпраздновать Новый год",
+                    new BooleanHabitResult(Guid.NewGuid(), true),
+                    new Frequency(IntervalType.Month, 12),
+                    true
                 )
             }
         );

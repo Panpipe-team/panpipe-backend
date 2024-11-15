@@ -23,4 +23,15 @@ public class HabitParamsSet
     public bool IsPublicTemplate { get; init; }
 
     public HabitResultType ResultType => Goal.Type;
+
+    public List<DateTimeOffset> CalculateTimestampsOfEmptyMarksForNewlyCreatedHabit() 
+        => Frequency.CalculateTimestampsOfEmptyMarksForNewlyCreatedHabit();
+
+    public List<DateTimeOffset> CalculateTimestampsOfEmptyMarksForExistingHabitFromLastMarkTimestamp(
+        DateTimeOffset lastMarkTimestamp
+    ) 
+        => Frequency.CalculateTimestampsOfEmptyMarksForExistingHabitFromLastMarkTimestamp
+        (
+            lastMarkTimestamp
+        );
 }

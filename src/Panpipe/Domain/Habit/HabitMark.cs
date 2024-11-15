@@ -5,9 +5,23 @@ namespace Panpipe.Domain.Habit;
 
 public class HabitMark
 {
+    private HabitMark() { }
+
+    private HabitMark(Guid id, DateTimeOffset timestampUtc, AbstractHabitResult? result)
+    {
+        Id = id;
+        TimestampUtc = timestampUtc;
+        Result = result;
+    }
+
     public Guid Id { get; init; }
     public DateTimeOffset TimestampUtc { get; init; }
     public AbstractHabitResult? Result { get; private set; }
+
+    public static HabitMark CreateEmpty(Guid id, DateTimeOffset timestampUtc)
+    {
+        return new HabitMark(id, timestampUtc, null);
+    }
 
     public Result ChangeResult(AbstractHabitResult newResult)
     {

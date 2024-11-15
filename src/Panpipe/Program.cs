@@ -4,7 +4,9 @@ using Panpipe.Persistence;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDbContextPool<AppDbContext>(
-    options => options.UseNpgsql("Host=db;Database=panpipe;Username=panpipe;Password=panpipe")
+    options => options
+        .UseNpgsql("Host=db;Database=panpipe;Username=panpipe;Password=panpipe")
+        .EnableSensitiveDataLogging()
 );
 
 builder.Services.Configure<RouteOptions>(options => options.LowercaseUrls = true);

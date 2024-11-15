@@ -3,14 +3,26 @@ using Panpipe.Domain.HabitResult;
 
 namespace Panpipe.Domain.Habit;
 
-public class Habit
+public class Habit(Guid id, Guid paramsSetId)
 {
     private readonly List<HabitMark> marks = new ();
 
-    public Guid Id { get; init; }
-    public Guid ParamsSetId { get; init; }
+    public Guid Id { get; init; } = id;
+    public Guid ParamsSetId { get; init; } = paramsSetId;
 
     public ICollection<HabitMark> Marks => marks.AsReadOnly();
+
+    public Result AddEmptyMark(HabitMark habitMark)
+    {
+        if (habitMark.Result is not null)
+        {
+            return Result.Invalid(new ValidationError($"Habit mark with id {habitMark.Id} is not null"));
+        }
+
+        marks.Add(habitMark);
+
+        return Result.Success();
+    }
 
     public Result ChangeResult(Guid habitMarkId, AbstractHabitResult newResult) 
     {
