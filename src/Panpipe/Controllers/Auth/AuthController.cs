@@ -50,7 +50,8 @@ public class AuthController: ControllerBase
 
     [HttpPost]
     [Route("login")]
-    public async Task<ActionResult<LoginResponse>> Login([FromBody] LoginRequest request)
+    [TranslateResultToActionResult]
+    public async Task<Result<LoginResponse>> Login([FromBody] LoginRequest request)
     {
         var isPersistent = true;
         var lockoutOnFailure = false;
@@ -60,25 +61,26 @@ public class AuthController: ControllerBase
 
         if (!result.Succeeded)
         {
-            return Result.Unauthorized("Wrong login or password").ToActionResult(this);
+            return Result.Unauthorized("Wrong login or password");
         }
 
         var user = await _userManager.FindByNameAsync(userName);
 
         if (user is null)
         {
-            return Result.CriticalError("Signed in user cannot be found").ToActionResult(this);
+            return Result.CriticalError("Signed in user cannot be found");
         }
 
-        return Result.Success(user.Id).Map(guid => new LoginResponse(guid)).ToActionResult(this);
+        return Result.Success(user.Id).Map(guid => new LoginResponse(guid));
     }
 
     [HttpPost]
     [Route("logout")]
-    public async Task<ActionResult> Logout()
+    [TranslateResultToActionResult]
+    public async Task<Result> Logout()
     {
         await _signInManager.SignOutAsync();
 
-        return Result.Success().ToActionResult(this);
+        return Result.Success();
     }
 }

@@ -24,6 +24,7 @@ public class HabitsController(AppDbContext appDbContext, UserManager<AppIdentity
 
     [HttpGet]
     [Route("templates")]
+    [TranslateResultToActionResult]
     public async Task<Result<GetPublicTemplatesResponse>> GetPublicTemplates()
     {
         var templates = await _appDbContext.HabitParamsSets

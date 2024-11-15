@@ -39,6 +39,7 @@ public class GroupsController(AppDbContext dbContext, UserManager<AppIdentityUse
     }
 
     [HttpGet]
+    [TranslateResultToActionResult]
     public async Task<Result<GetGroupsResponse>> GetGroups()
     {
         var user = await _userManager.GetUserAsync(User);
@@ -59,6 +60,7 @@ public class GroupsController(AppDbContext dbContext, UserManager<AppIdentityUse
     }
 
     [HttpPost]
+    [TranslateResultToActionResult]
     public async Task<Result<CreateGroupResponse>> CreateGroup([FromBody] CreateGroupRequest request)
     {
         var user = await _userManager.GetUserAsync(User);
