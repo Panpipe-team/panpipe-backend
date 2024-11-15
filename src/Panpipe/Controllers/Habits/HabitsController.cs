@@ -1,5 +1,7 @@
 using Ardalis.Result;
 using Ardalis.Result.AspNetCore;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Panpipe.Controllers.Habits.Helpers;
@@ -8,14 +10,17 @@ using Panpipe.Domain.HabitOwner;
 using Panpipe.Domain.HabitParamsSet;
 using Panpipe.Domain.HabitResult;
 using Panpipe.Persistence;
+using Panpipe.Persistence.Identity;
 
 namespace Panpipe.Controllers.Habits;
 
 [ApiController]
 [Route("/api/v1/[controller]")]
-public class HabitsController(AppDbContext appDbContext): ControllerBase
+[Authorize]
+public class HabitsController(AppDbContext appDbContext, UserManager<AppIdentityUser> userManager): ControllerBase
 {
     private readonly AppDbContext _appDbContext = appDbContext;
+    private readonly UserManager<AppIdentityUser> _userManager = userManager;
 
     [HttpGet]
     [Route("templates")]
@@ -87,11 +92,16 @@ public class HabitsController(AppDbContext appDbContext): ControllerBase
     [TranslateResultToActionResult]
     public async Task<Result<GetHabitsResponse>> GetHabits()
     {
-        var userId = Guid.Empty;
+        var user = await _userManager.GetUserAsync(User);
+
+        if (user is null)
+        {
+            return Result.Unauthorized("Cannot find authorized user by claim");
+        }
 
         var habitIds = await _appDbContext.UserHabitOwners
             .AsNoTracking()
-            .Where(x => x.UserId == userId)
+            .Where(x => x.UserId == user.Id)
             .Select(x => x.HabitId)
             .ToListAsync();
         
@@ -139,7 +149,12 @@ public class HabitsController(AppDbContext appDbContext): ControllerBase
     [TranslateResultToActionResult]
     public async Task<Result<CreateHabitResponse>> CreateHabit([FromBody] CreateHabitRequest request)
     {
-        var userId = Guid.Empty;
+        var user = await _userManager.GetUserAsync(User);
+
+        if (user is null)
+        {
+            return Result.Unauthorized("Cannot find authorized user by claim");
+        }
 
         var habitParamsSet = await _appDbContext.HabitParamsSets
             .AsNoTracking()
@@ -155,7 +170,7 @@ public class HabitsController(AppDbContext appDbContext): ControllerBase
 
         _appDbContext.Habits.Add(habit);
 
-        var userHabitOwner = new UserHabitOwner(Guid.NewGuid(), userId, habit.Id);
+        var userHabitOwner = new UserHabitOwner(Guid.NewGuid(), user.Id, habit.Id);
 
         _appDbContext.UserHabitOwners.Add(userHabitOwner);
 

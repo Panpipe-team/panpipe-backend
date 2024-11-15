@@ -1,25 +1,28 @@
 using Ardalis.Result;
 using Ardalis.Result.AspNetCore;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Panpipe.Domain.Group;
 using Panpipe.Persistence;
+using Panpipe.Persistence.Identity;
 
 namespace Panpipe.Controllers.Groups;
 
 [ApiController]
 [Route("/api/v1/[controller]")]
-public class GroupsController(AppDbContext dbContext) : ControllerBase
+[Authorize]
+public class GroupsController(AppDbContext dbContext, UserManager<AppIdentityUser> userManager) : ControllerBase
 {
     private readonly AppDbContext _dbContext = dbContext;
+    private readonly UserManager<AppIdentityUser> _userManager = userManager;
 
     [HttpGet]
     [Route("{id:guid}")]
     [TranslateResultToActionResult]
     public async Task<Result<GetGroupResponse>> GetGroup([FromRoute] Guid id)
     {
-        var userId = Guid.Empty;
-
         var group = await _dbContext.Groups
             .AsNoTracking()
             .Where(group => group.Id == id)
@@ -38,11 +41,16 @@ public class GroupsController(AppDbContext dbContext) : ControllerBase
     [HttpGet]
     public async Task<Result<GetGroupsResponse>> GetGroups()
     {
-        var userId = Guid.Empty;
+        var user = await _userManager.GetUserAsync(User);
+
+        if (user is null)
+        {
+            return Result.Unauthorized("Cannot find authorized user by claim");
+        }
 
         var groups = await _dbContext.Groups
             .AsNoTracking()
-            .Where(group => group.UserIds.Contains(userId))
+            .Where(group => group.UserIds.Contains(user.Id))
             .ToListAsync();
 
         return Result.Success(
@@ -53,9 +61,14 @@ public class GroupsController(AppDbContext dbContext) : ControllerBase
     [HttpPost]
     public async Task<Result<CreateGroupResponse>> CreateGroup([FromBody] CreateGroupRequest request)
     {
-        var userId = Guid.Empty;
+        var user = await _userManager.GetUserAsync(User);
 
-        var group = new Group(Guid.NewGuid(), request.Name, userId);
+        if (user is null)
+        {
+            return Result.Unauthorized("Cannot find authorized user by claim");
+        }
+
+        var group = new Group(Guid.NewGuid(), request.Name, user.Id);
 
         _dbContext.Groups.Add(group);
         await _dbContext.SaveChangesAsync();
