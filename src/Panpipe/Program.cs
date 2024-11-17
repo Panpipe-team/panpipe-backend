@@ -55,8 +55,8 @@ SeedIdentityDatabase(app);
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.UseSwagger();
-app.UseSwaggerUI();
+app.UseSwagger(c => c.RouteTemplate = "api" + c.RouteTemplate);
+app.UseSwaggerUI(c => c.RoutePrefix = "api/swagger");
 
 app.MapControllers();
 
