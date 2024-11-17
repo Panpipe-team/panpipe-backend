@@ -4,5 +4,46 @@ services:
     build: 
       context: .
       target: final
+    depends_on:
+      - db
     ports:
       - ${WEB_API_PORT:-8080}:8080
+  
+  db:
+    image: postgres:latest
+    expose:
+      - 5432
+    environment:
+      - POSTGRES_USER=panpipe
+      - POSTGRES_PASSWORD=panpipe
+      - POSTGRES_DB=panpipe
+    volumes:
+      - db-volume:/var/lib/postgresql/data
+  
+  db-identity:
+    image: postgres:latest
+    expose:
+      - 5432
+    environment:
+      - POSTGRES_USER=panpipe
+      - POSTGRES_PASSWORD=panpipe
+      - POSTGRES_DB=panpipe-identity
+    volumes:
+      - db-identity-volume:/var/lib/postgresql/data
+  
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    profiles:
+      - debug-sql
+    ports:
+      - 8081:80
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=panpipe@panpipe.org
+      - PGADMIN_DEFAULT_PASSWORD=panpipe
+    volumes:
+      - pgadmin-volume:/var/lib/pgadmin
+
+volumes:
+  db-volume:
+  db-identity-volume:
+  pgadmin-volume:

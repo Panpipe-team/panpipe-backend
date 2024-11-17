@@ -1,0 +1,6 @@
+@Panpipe_HostAddress = http://localhost:5188
+
+GET {{Panpipe_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
