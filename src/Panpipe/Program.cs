@@ -72,6 +72,8 @@ static async Task SeedAppDatabase(WebApplication app)
     catch (Exception ex)
     {
         app.Logger.LogError(ex, "An error occurred seeding the DB.");
+
+        throw;
     }
 }
 
