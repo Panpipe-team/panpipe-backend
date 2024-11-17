@@ -6,9 +6,14 @@ using Panpipe.Persistence.Identity;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDbContextPool<AppDbContext>(
-    options => options
-        .UseNpgsql("Host=db;Database=panpipe;Username=panpipe;Password=panpipe")
-        .EnableSensitiveDataLogging()
+    options => 
+    {
+        options.UseNpgsql("Host=db;Database=panpipe;Username=panpipe;Password=panpipe");
+        if (builder.Environment.IsDevelopment())
+        {
+            options.EnableSensitiveDataLogging();
+        }
+    } 
 );
 
 builder.Services.AddDbContextPool<AppIdentityDbContext>(
