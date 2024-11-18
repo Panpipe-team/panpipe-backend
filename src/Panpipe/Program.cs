@@ -28,6 +28,8 @@ builder.Services.AddAuthorization();
 
 builder.Services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
 
+builder.Services.AddCors();
+
 builder.Services.AddControllers();
 
 builder.Services.AddEndpointsApiExplorer();
@@ -54,6 +56,8 @@ SeedIdentityDatabase(app);
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseCors(builder => builder.AllowAnyOrigin());
 
 app.UseSwagger(c => c.RouteTemplate = "api" + c.RouteTemplate);
 app.UseSwaggerUI(c => c.RoutePrefix = "api/swagger");
