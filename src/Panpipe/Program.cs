@@ -57,7 +57,11 @@ SeedIdentityDatabase(app);
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.UseCors(builder => builder.AllowAnyOrigin());
+app.UseCors(
+    builder => builder
+        .AllowAnyOrigin()
+        .AllowAnyHeader()
+        .AllowAnyMethod());
 
 app.UseSwagger(c => c.RouteTemplate = "api" + c.RouteTemplate);
 app.UseSwaggerUI(c => c.RoutePrefix = "api/swagger");
