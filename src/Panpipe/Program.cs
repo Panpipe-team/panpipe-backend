@@ -59,9 +59,11 @@ app.UseAuthorization();
 
 app.UseCors(
     builder => builder
-        .AllowAnyOrigin()
+        .SetIsOriginAllowed(_ => true)
         .AllowAnyHeader()
-        .AllowAnyMethod());
+        .AllowAnyMethod()
+        .AllowCredentials()
+);
 
 app.UseSwagger(c => c.RouteTemplate = "api" + c.RouteTemplate);
 app.UseSwaggerUI(c => c.RoutePrefix = "api/swagger");
