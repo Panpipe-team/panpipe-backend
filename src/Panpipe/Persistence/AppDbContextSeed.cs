@@ -19,7 +19,7 @@ public static class AppDbContextSeed
                 ),
                 new (
                     Guid.NewGuid(),
-                    "Отпраздновать Новый год",
+                    "Отпраздновать день рождения",
                     new BooleanHabitResult(Guid.NewGuid(), true),
                     new Frequency(IntervalType.Month, 12),
                     true

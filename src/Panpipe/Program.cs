@@ -6,9 +6,14 @@ using Panpipe.Persistence.Identity;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDbContextPool<AppDbContext>(
-    options => options
-        .UseNpgsql("Host=db;Database=panpipe;Username=panpipe;Password=panpipe")
-        .EnableSensitiveDataLogging()
+    options => 
+    {
+        options.UseNpgsql("Host=db;Database=panpipe;Username=panpipe;Password=panpipe");
+        if (builder.Environment.IsDevelopment())
+        {
+            options.EnableSensitiveDataLogging();
+        }
+    } 
 );
 
 builder.Services.AddDbContextPool<AppIdentityDbContext>(
@@ -22,6 +27,8 @@ builder.Services.AddAuthentication();
 builder.Services.AddAuthorization();
 
 builder.Services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
+
+builder.Services.AddCors();
 
 builder.Services.AddControllers();
 
@@ -50,8 +57,10 @@ SeedIdentityDatabase(app);
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.UseSwagger();
-app.UseSwaggerUI();
+app.UseCors(builder => builder.AllowAnyOrigin());
+
+app.UseSwagger(c => c.RouteTemplate = "api" + c.RouteTemplate);
+app.UseSwaggerUI(c => c.RoutePrefix = "api/swagger");
 
 app.MapControllers();
 
@@ -72,6 +81,8 @@ static async Task SeedAppDatabase(WebApplication app)
     catch (Exception ex)
     {
         app.Logger.LogError(ex, "An error occurred seeding the DB.");
+
+        throw;
     }
 }
 
