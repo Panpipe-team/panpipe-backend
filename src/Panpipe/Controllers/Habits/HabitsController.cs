@@ -195,34 +195,35 @@ public class HabitsController(AppDbContext appDbContext, UserManager<AppIdentity
         [FromRoute] Guid habitId, [FromRoute] Guid markId, [FromBody] ChangeHabitResultRequest request
     )
     {
-        var habit = await _appDbContext.Habits
+        var habitWithHabitParamsSet = await _appDbContext.Habits
             .Where(habit => habit.Id == habitId)
             .Include(habit => habit.Marks)
-                .ThenInclude(x => x.Result)
+                .ThenInclude(habit => habit.Result)
+            .Join(
+                _appDbContext.HabitParamsSets
+                    .Include(habitParamsSet => habitParamsSet.Goal),
+                habit => habit.ParamsSetId,
+                paramsSet => paramsSet.Id,
+                (habit, paramsSet) => new 
+                {
+                    habit,
+                    paramsSet
+                }
+            )
             .FirstOrDefaultAsync();
         
-        if (habit is null)
+        if (habitWithHabitParamsSet is null)
         {
-            return Result.NotFound($"Habit with id {habitId} is not found");
+            return Result.NotFound($"Habit with id {habitId} or its' params set is not found");
         }
 
-        var habitParamsSet = await _appDbContext.HabitParamsSets
-            .AsNoTracking()
-            .Where(habitParamsSet => habitParamsSet.Id == habit.ParamsSetId)
-            .Include(habitParamsSet => habitParamsSet.Goal)
-            .FirstOrDefaultAsync();
-        
-        if (habitParamsSet is null)
-        {
-            return Result.CriticalError(
-                $"For found habit with id {habitId} habit params set with id {habit.ParamsSetId} was not found"
-            );
-        }
+        var habit = habitWithHabitParamsSet.habit;
+        var paramsSet = habitWithHabitParamsSet.paramsSet;
 
-        if (!habitParamsSet.ResultType.TryParse(request.Value, out var newResult))
+        if (!paramsSet.ResultType.TryParse(request.Value, out var newResult))
         {
             return Result.Invalid(new ValidationError(
-                $"Cannot parse string \'{request.Value}\' into habit result type \'{habitParamsSet.ResultType}\'"
+                $"Cannot parse string \'{request.Value}\' into habit result type \'{paramsSet.ResultType}\'"
             ));
         }
 
