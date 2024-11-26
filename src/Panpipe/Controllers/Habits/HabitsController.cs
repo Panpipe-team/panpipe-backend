@@ -7,7 +7,6 @@ using Microsoft.EntityFrameworkCore;
 using Panpipe.Controllers.Habits.Helpers;
 using Panpipe.Domain.Habit;
 using Panpipe.Domain.HabitOwner;
-using Panpipe.Domain.HabitParamsSet;
 using Panpipe.Domain.HabitResult;
 using Panpipe.Persistence;
 using Panpipe.Persistence.Identity;
@@ -100,48 +99,43 @@ public class HabitsController(AppDbContext appDbContext, UserManager<AppIdentity
             return Result.Unauthorized("Cannot find authorized user by claim");
         }
 
-        var habitIds = await _appDbContext.UserHabitOwners
+        var result = await _appDbContext.UserHabitOwners
             .AsNoTracking()
             .Where(x => x.UserId == user.Id)
-            .Select(x => x.HabitId)
+            .Join(
+                _appDbContext.Habits
+                    .AsNoTracking(),
+                userHabitOwner => userHabitOwner.HabitId,
+                habit => habit.Id,
+                (userHabitOwner, habit) => new
+                {
+                    habit.Id,
+                    habit.ParamsSetId
+                }
+            )
+            .Join(
+                _appDbContext.HabitParamsSets
+                    .AsNoTracking()
+                    .Include(x => x.Goal),
+                habitIdAndHabitParamsSetId => habitIdAndHabitParamsSetId.ParamsSetId,
+                paramsSet => paramsSet.Id,
+                (habitIdAndHabitParamsSetId, paramsSet) => new {
+                    habitIdAndHabitParamsSetId.Id,
+                    paramsSet.Name,
+                    paramsSet.Frequency,
+                    paramsSet.Goal,
+                    paramsSet.ResultType
+                }
+            )
             .ToListAsync();
-        
-        var habits = await _appDbContext.Habits
-            .AsNoTracking()
-            .Where(x => habitIds.Contains(x.Id))
-            .ToListAsync();
-        
-        var habitParamsSetIds = habits.Select(x => x.ParamsSetId).ToList();
-
-        var habitParamsSets = await _appDbContext.HabitParamsSets
-            .AsNoTracking()
-            .Where(x => habitParamsSetIds.Contains(x.Id))
-            .Include(x => x.Goal)
-            .ToListAsync();
-
-        var result = new List<Tuple<Habit, HabitParamsSet>>();
-
-        foreach (var habit in habits)
-        {
-            var habitParamsSet = habitParamsSets.FirstOrDefault(x => x.Id == habit.ParamsSetId);
-            
-            if (habitParamsSet is null)
-            {
-                return Result.CriticalError(
-                    $"For found habit with id {habit.Id} was not found habit params set with id {habit.ParamsSetId}"
-                );
-            }
-
-            result.Add(new (habit, habitParamsSet));
-        }
 
         return Result.Success(new GetHabitsResponse(
             result.Select(habitInfo => new GetHabitsResponseHabit(
-                habitInfo.Item1.Id,
-                habitInfo.Item2.Name,
-                habitInfo.Item2.Frequency.ToReadableString(),
-                habitInfo.Item2.Goal.ToReadableString(),
-                habitInfo.Item2.ResultType.ToString()
+                habitInfo.Id,
+                habitInfo.Name,
+                habitInfo.Frequency.ToReadableString(),
+                habitInfo.Goal.ToReadableString(),
+                habitInfo.ResultType.ToString()
             )).ToList()
         ));
     }
