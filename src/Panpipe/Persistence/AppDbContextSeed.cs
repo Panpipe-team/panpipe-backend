@@ -5,25 +5,60 @@ namespace Panpipe.Persistence;
 
 public static class AppDbContextSeed
 {
+    private static int countSteps = 5000;
+    private static int hoursSleep = 7;
+    private static int countEnglishLesson = 3;
+    private static int countPage = 30;
+    private static int hoursJobSession = 8;
+    private static float spendCalories = 200.5F;
+    
     public static async Task SeedAsync(AppDbContext context)
-    { 
+    {
         await context.HabitParamsSets.AddRangeAsync(
             new List<HabitParamsSet> 
             {
                 new (
                     Guid.NewGuid(),
-                    "Выпивать воду, литров",
-                    new FloatHabitResult(Guid.NewGuid(), 2.5f),
+                    $"Пройти {countSteps} шагов в день",
+                    new IntegerHabitResult(Guid.NewGuid(), countSteps),
                     new Frequency(IntervalType.Day, 1),
                     true
                 ),
                 new (
                     Guid.NewGuid(),
-                    "Отпраздновать день рождения",
-                    new BooleanHabitResult(Guid.NewGuid(), true),
-                    new Frequency(IntervalType.Month, 12),
+                    $"Спать {hoursSleep} часов в день",
+                    new IntegerHabitResult(Guid.NewGuid(), hoursSleep),
+                    new Frequency(IntervalType.Day, 1),
                     true
-                )
+                ),
+                new (
+                    Guid.NewGuid(),
+                    $"Заниматься уроками английского языка {countEnglishLesson} раза в неделю",
+                    new IntegerHabitResult(Guid.NewGuid(), countEnglishLesson),
+                    new Frequency(IntervalType.Week, 3),
+                    true
+                ),
+                new (
+                    Guid.NewGuid(),
+                    $"Прочитать {countPage} страниц в день",
+                    new IntegerHabitResult(Guid.NewGuid(), countPage),
+                    new Frequency(IntervalType.Day, 1),
+                    true
+                ),
+                new (
+                    Guid.NewGuid(),
+                    $"Рабочая сессия без отвлечения {hoursJobSession} часов в день",
+                    new IntegerHabitResult(Guid.NewGuid(), hoursJobSession),
+                    new Frequency(IntervalType.Day, 1),
+                    true
+                ),
+                new (
+                    Guid.NewGuid(),
+                    $"Потратить {spendCalories} калорий в день",
+                    new FloatHabitResult(Guid.NewGuid(), spendCalories),
+                    new Frequency(IntervalType.Day, 1),
+                    false
+                ),
             }
         );
 

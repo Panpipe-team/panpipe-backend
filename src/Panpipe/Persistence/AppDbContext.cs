@@ -44,6 +44,11 @@ public class AppDbContext(DbContextOptions options): DbContext(options)
         modelBuilder.Entity<FloatHabitResult>()
             .Property(x => x.Value)
             .IsRequired();
+        
+        // IntegerHabitResult
+        modelBuilder.Entity<IntegerHabitResult>()
+            .Property(x => x.Value)
+            .IsRequired();
             
         // HabitParamsSet
         modelBuilder.Entity<HabitParamsSet>()
