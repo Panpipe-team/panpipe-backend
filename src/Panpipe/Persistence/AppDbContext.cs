@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Panpipe.Domain.Group;
 using Panpipe.Domain.Habit;
+using Panpipe.Domain.HabitCollection;
 using Panpipe.Domain.HabitOwner;
 using Panpipe.Domain.HabitParamsSet;
 using Panpipe.Domain.HabitResult;
@@ -17,6 +18,7 @@ public class AppDbContext(DbContextOptions options): DbContext(options)
     public DbSet<Tag> Tags { get; set; }
     public DbSet<AbstractHabitResult> AbstractHabitResults { get; set; }
     public DbSet<Habit> Habits { get; set; }
+    public DbSet<HabitCollection> HabitCollections { get; set; }
     public DbSet<HabitMark> HabitMarks { get; set; }
     public DbSet<UserHabitOwner> UserHabitOwners { get; set; }
     public DbSet<GroupHabitOwner> GroupHabitOwners { get; set; }
@@ -91,6 +93,17 @@ public class AppDbContext(DbContextOptions options): DbContext(options)
         modelBuilder.Entity<Habit>()
             .HasMany(x => x.Marks)
             .WithOne();
+        
+        // HabitCollection
+        modelBuilder.Entity<HabitCollection>()
+            .HasOne<HabitParamsSet>()
+            .WithMany()
+            .HasForeignKey(x => x.ParamsSetId)
+            .IsRequired();
+        
+        modelBuilder.Entity<HabitCollection>()
+            .Property(x => x.HabitIds)
+            .IsRequired();
         
         // HabitMark
         modelBuilder.Entity<HabitMark>()

@@ -4,6 +4,8 @@ public class HabitCollection
 {
     private readonly List<Guid> _habitIds;
 
+    #pragma warning disable CS8618 // Required by Entity Framework
+    private HabitCollection() {}
     public HabitCollection(Guid id, Guid paramsSetId, List<Guid> habitIds)
     {
         Id = id;
