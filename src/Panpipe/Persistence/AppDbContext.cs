@@ -17,6 +17,8 @@ public class AppDbContext(DbContextOptions options): DbContext(options)
     public DbSet<Habit> Habits { get; set; }
     public DbSet<HabitMark> HabitMarks { get; set; }
     public DbSet<UserHabitOwner> UserHabitOwners { get; set; }
+    public DbSet<GroupHabitOwner> GroupHabitOwners { get; set; }
+    public DbSet<GroupUserHabitOwner> GroupUserHabitOwners { get; set; }
 
     #pragma warning restore CS8618
 
@@ -95,6 +97,36 @@ public class AppDbContext(DbContextOptions options): DbContext(options)
             .HasOne<Habit>()
             .WithOne()
             .HasForeignKey<UserHabitOwner>(x => x.HabitId)
+            .IsRequired();
+        
+        // GroupHabitOwner        
+        modelBuilder.Entity<GroupHabitOwner>()
+            .HasOne<Group>()
+            .WithMany()
+            .HasForeignKey(x => x.GroupId)
+            .IsRequired();
+
+        modelBuilder.Entity<GroupHabitOwner>()
+            .HasOne<Habit>()
+            .WithOne()
+            .HasForeignKey<GroupHabitOwner>(x => x.HabitId)
+            .IsRequired();
+        
+        // GroupUserHabitOwner        
+        modelBuilder.Entity<GroupUserHabitOwner>()
+            .Property(x => x.UserId)
+            .IsRequired();
+        
+        modelBuilder.Entity<GroupUserHabitOwner>()
+            .HasOne<Group>()
+            .WithMany()
+            .HasForeignKey(x => x.GroupId)
+            .IsRequired();
+
+        modelBuilder.Entity<GroupUserHabitOwner>()
+            .HasOne<Habit>()
+            .WithOne()
+            .HasForeignKey<GroupUserHabitOwner>(x => x.HabitId)
             .IsRequired();
     }
 }
