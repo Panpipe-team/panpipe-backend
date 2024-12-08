@@ -1,5 +1,6 @@
 using Ardalis.Result;
 using Ardalis.Result.AspNetCore;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Panpipe.Controllers.Auth;
@@ -9,6 +10,7 @@ namespace Panpipe.Controllers.Accounts;
 
 [ApiController]
 [Route("/api/v1.1/[controller]")]
+[Authorize]
 public class AccountsController(
     UserManager<AppIdentityUser> userManager,
     SignInManager<AppIdentityUser> signInManager

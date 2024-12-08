@@ -8,23 +8,19 @@ using Panpipe.Persistence.Identity;
 namespace Panpipe.Controllers.Users;
 
 [ApiController]
-[Route("/api/v1/[controller]")]
+[Route("/api/v1.1/[controller]")]
 [Authorize]
-public class UsersController: ControllerBase
+public class UsersController(UserManager<AppIdentityUser> userManager): ControllerBase
 {
-    private readonly UserManager<AppIdentityUser> _userManager;
-
-    public UsersController(UserManager<AppIdentityUser> userManager)
-    {
-        _userManager = userManager;
-    }
+    private readonly UserManager<AppIdentityUser> _userManager = userManager;
 
     [HttpGet]
     [Route("{id:guid}")]
-    [Authorize]
     [TranslateResultToActionResult]
-    public async Task<Result<GetUserResponse>> Get([FromRoute] Guid id)
+    public async Task<Result<GetUserByIdResponse>> GetById([FromRoute] Guid id)
     {
+        const string ReplacementForNullName = "";
+
         var user = await _userManager.FindByIdAsync(id.ToString());
 
         if (user is null)
@@ -39,6 +35,14 @@ public class UsersController: ControllerBase
 
         var userName = user.UserName;
 
-        return Result.Success(user).Map(user => new GetUserResponse(userName));
+        return Result.Success(user).Map(user => new GetUserByIdResponse(userName, user.FullName ?? ReplacementForNullName));
+    }
+
+    [HttpGet]
+    [TranslateResultToActionResult]
+    public async Task<Result<GetUserByLoginResponse>> GetByLogin([FromQuery] string Login)
+    {
+        // FAKED
+        return Result.Success().Map(_ => new GetUserByLoginResponse(Guid.Empty, "Faked user name"));
     }
 }
