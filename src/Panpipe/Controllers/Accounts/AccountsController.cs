@@ -9,20 +9,13 @@ namespace Panpipe.Controllers.Accounts;
 
 [ApiController]
 [Route("/api/v1.1/[controller]")]
-public class AccountsController : ControllerBase
+public class AccountsController(
+    UserManager<AppIdentityUser> userManager,
+    SignInManager<AppIdentityUser> signInManager
+) : ControllerBase
 {
-    private readonly UserManager<AppIdentityUser> _userManager;
-    private readonly SignInManager<AppIdentityUser> _signInManager;
-
-    public AccountsController
-    (
-        UserManager<AppIdentityUser> userManager,
-        SignInManager<AppIdentityUser> signInManager
-    )
-    {
-        _userManager = userManager;
-        _signInManager = signInManager;
-    }
+    private readonly UserManager<AppIdentityUser> _userManager = userManager;
+    private readonly SignInManager<AppIdentityUser> _signInManager = signInManager;
 
     [HttpPut]
     [Route("name")]
