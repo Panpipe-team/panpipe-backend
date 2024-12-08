@@ -1,3 +1,3 @@
 namespace Panpipe.Controllers.Groups;
 
-public record CreateGroupResponse(Guid GroupId);
+public record CreateGroupResponse(Guid Id);
