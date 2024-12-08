@@ -13,7 +13,7 @@ using Panpipe.Persistence.Identity;
 namespace Panpipe.Controllers.Habits;
 
 [ApiController]
-[Route("/api/v1/[controller]")]
+[Route("/api/v1.1/[controller]")]
 [Authorize]
 public class HabitsController(AppDbContext appDbContext, UserManager<AppIdentityUser> userManager): ControllerBase
 {

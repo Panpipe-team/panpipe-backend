@@ -130,9 +130,7 @@ public class UsersHabitsController(AppDbContext appDbContext, UserManager<AppIde
 
     [HttpPost]
     [TranslateResultToActionResult]
-    public async Task<Result<CreateUserHabitResponse>> Create(
-        [FromQuery] Guid? templateId, [FromBody] CreateUserHabitRequest? request
-    )
+    public async Task<Result<CreateUserHabitResponse>> Create([FromQuery] Guid? templateId)
     {
         // FAKED
         return Result.Success(new CreateUserHabitResponse(Guid.Empty));

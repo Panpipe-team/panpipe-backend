@@ -40,9 +40,9 @@ public class UsersController(UserManager<AppIdentityUser> userManager): Controll
 
     [HttpGet]
     [TranslateResultToActionResult]
-    public async Task<Result<GetUserByLoginResponse>> GetByLogin([FromQuery] string Login)
+    public async Task<Result<GetUserByLoginResponse>> GetByLogin([FromQuery] string login)
     {
         // FAKED
-        return Result.Success().Map(_ => new GetUserByLoginResponse(Guid.Empty, "Faked user name"));
+        return Result.Success().Map(_ => new GetUserByLoginResponse(Guid.Empty, $"Faked user name with login {login}"));
     }
 }
