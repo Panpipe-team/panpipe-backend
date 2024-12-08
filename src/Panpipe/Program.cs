@@ -2,8 +2,13 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Panpipe.Persistence;
 using Panpipe.Persistence.Identity;
+using Panpipe.Sheduler;
+using Panpipe.Sheduler.Job;
+using Quartz;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddQuartzSchedulerExtension();
 
 builder.Services.AddDbContextPool<AppDbContext>(
     options => 
