@@ -5,8 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Panpipe.Controllers.Habits.Helpers;
-using Panpipe.Domain.Habit;
-using Panpipe.Domain.HabitOwner;
+using Panpipe.Controllers.Helpers;
 using Panpipe.Domain.HabitResult;
 using Panpipe.Persistence;
 using Panpipe.Persistence.Identity;
@@ -14,7 +13,7 @@ using Panpipe.Persistence.Identity;
 namespace Panpipe.Controllers.Habits;
 
 [ApiController]
-[Route("/api/v1/[controller]")]
+[Route("/api/v1.1/[controller]")]
 [Authorize]
 public class HabitsController(AppDbContext appDbContext, UserManager<AppIdentityUser> userManager): ControllerBase
 {
@@ -30,13 +29,16 @@ public class HabitsController(AppDbContext appDbContext, UserManager<AppIdentity
             .AsNoTracking()
             .Where(x => x.IsPublicTemplate)
             .Include(x => x.Goal)
+            .Include(x => x.Tags)
             .ToListAsync();
         
         return Result.Success(new GetPublicTemplatesResponse(templates.Select(template => 
             new GetPublicTemplatesResponseTemplate(
                 template.Id, 
                 template.Name, 
-                template.Frequency.ToReadableString(), 
+                template.Description,
+                template.Tags.Select(tag => new GetPublicTemplatesResponseTag(tag.Id, tag.Name)).ToList(),
+                Periodicity.FromFrequency(template.Frequency),
                 template.Goal.ToReadableString(), 
                 template.ResultType.ToString()
             )
@@ -44,143 +46,26 @@ public class HabitsController(AppDbContext appDbContext, UserManager<AppIdentity
     }
 
     [HttpGet]
-    [Route("{id:guid}")]
+    [Route("tags")]
     [TranslateResultToActionResult]
-    public async Task<Result<GetHabitResponse>> GetHabit([FromRoute] Guid id)
+    public async Task<Result<GetTagsResponse>> GetAllTags()
     {
-        var result = await _appDbContext.Habits
-            .AsNoTracking()
-            .Where(x => x.Id == id)
-            .Include(x => x.Marks)
-                .ThenInclude(x => x.Result)
-            .Join(
-                _appDbContext.HabitParamsSets
-                    .AsNoTracking()
-                    .Include(x => x.Goal),
-                habit => habit.ParamsSetId,
-                paramsSet => paramsSet.Id,
-                (habit, paramsSet) => new 
-                {
-                    paramsSet.Name,
-                    paramsSet.Frequency,
-                    paramsSet.Goal,
-                    paramsSet.ResultType,
-                    habit.Marks
-                }
-            )
-            .FirstOrDefaultAsync();
-        
-        if (result is null)
-        {
-            return Result.NotFound();
-        }
-        
-        return Result.Success(new GetHabitResponse(
-            result.Name,
-            result.Frequency.ToReadableString(),
-            result.Goal.ToReadableString(),
-            result.ResultType.ToString(),
-            result.Marks.Select(mark => new GetHabitResponseMark(
-                mark.Id, 
-                mark.TimestampUtc.UtcDateTime,
-                mark.Result is null ? null : new GetHabitResponseMarkResult(mark.Result.ToReadableString()) 
-            )).ToList()
+        // FAKED
+        return Result.Success(new GetTagsResponse(
+            [
+                new GetTagsResponseTag(Guid.Empty, "Faked tag name")
+            ]
         ));
     }
 
     [HttpGet]
+    [Route("tags/{id:guid}")]
     [TranslateResultToActionResult]
-    public async Task<Result<GetHabitsResponse>> GetHabits()
+    public async Task<Result<GetTagResponse>> GetTagById([FromRoute] Guid id)
     {
-        var user = await _userManager.GetUserAsync(User);
-
-        if (user is null)
-        {
-            return Result.Unauthorized("Cannot find authorized user by claim");
-        }
-
-        var result = await _appDbContext.UserHabitOwners
-            .AsNoTracking()
-            .Where(x => x.UserId == user.Id)
-            .Join(
-                _appDbContext.Habits
-                    .AsNoTracking(),
-                userHabitOwner => userHabitOwner.HabitId,
-                habit => habit.Id,
-                (userHabitOwner, habit) => new
-                {
-                    habit.Id,
-                    habit.ParamsSetId
-                }
-            )
-            .Join(
-                _appDbContext.HabitParamsSets
-                    .AsNoTracking()
-                    .Include(x => x.Goal),
-                habitIdAndHabitParamsSetId => habitIdAndHabitParamsSetId.ParamsSetId,
-                paramsSet => paramsSet.Id,
-                (habitIdAndHabitParamsSetId, paramsSet) => new {
-                    habitIdAndHabitParamsSetId.Id,
-                    paramsSet.Name,
-                    paramsSet.Frequency,
-                    paramsSet.Goal,
-                    paramsSet.ResultType
-                }
-            )
-            .ToListAsync();
-
-        return Result.Success(new GetHabitsResponse(
-            result.Select(habitInfo => new GetHabitsResponseHabit(
-                habitInfo.Id,
-                habitInfo.Name,
-                habitInfo.Frequency.ToReadableString(),
-                habitInfo.Goal.ToReadableString(),
-                habitInfo.ResultType.ToString()
-            )).ToList()
-        ));
-    }
-
-    [HttpPost]
-    [TranslateResultToActionResult]
-    public async Task<Result<CreateHabitResponse>> CreateHabit([FromBody] CreateHabitRequest request)
-    {
-        var user = await _userManager.GetUserAsync(User);
-
-        if (user is null)
-        {
-            return Result.Unauthorized("Cannot find authorized user by claim");
-        }
-
-        var habitParamsSet = await _appDbContext.HabitParamsSets
-            .AsNoTracking()
-            .Where(x => x.Id == request.TemplateId)
-            .FirstOrDefaultAsync();
-
-        if (habitParamsSet is null)
-        {
-            return Result.Invalid(new ValidationError($"Not found habit params template with id {request.TemplateId}"));
-        }
-
-        var habit = new Habit(Guid.NewGuid(), request.TemplateId);
-
-        _appDbContext.Habits.Add(habit);
-
-        var userHabitOwner = new UserHabitOwner(Guid.NewGuid(), user.Id, habit.Id);
-
-        _appDbContext.UserHabitOwners.Add(userHabitOwner);
-
-        var emptyMarksTimestamps = habitParamsSet.CalculateTimestampsOfEmptyMarksForNewlyCreatedHabit();
-
-        foreach (var timestamp in emptyMarksTimestamps)
-        {
-            var emptyMark = HabitMark.CreateEmpty(Guid.NewGuid(), timestamp);
-            habit.AddEmptyMark(emptyMark);
-        }
-
-        await _appDbContext.SaveChangesAsync();
-
-        return Result.Created(new CreateHabitResponse(habit.Id));
-    }
+        // FAKED
+        return Result.Success(new GetTagResponse("Faked tag name 2"));
+    }   
 
     [HttpPut]
     [Route("{habitId:guid}/marks/{markId:guid}/result")]
@@ -214,7 +99,7 @@ public class HabitsController(AppDbContext appDbContext, UserManager<AppIdentity
         var habit = habitWithHabitParamsSet.habit;
         var paramsSet = habitWithHabitParamsSet.paramsSet;
 
-        if (!paramsSet.ResultType.TryParse(request.Value, out var newResult))
+        if (!paramsSet.ResultType.TryParse(request.Value, request.Comment, out var newResult))
         {
             return Result.Invalid(new ValidationError(
                 $"Cannot parse string \'{request.Value}\' into habit result type \'{paramsSet.ResultType}\'"
@@ -231,5 +116,20 @@ public class HabitsController(AppDbContext appDbContext, UserManager<AppIdentity
         }
 
         return result;
+    }
+
+    [HttpPut]
+    [Route("{habitId:guid}/parameters")]
+    public async Task<Result> ChangeHabitParams(
+        [FromRoute] Guid habitId,
+        [FromQuery] string? name,
+        [FromQuery] string? description,
+        [FromQuery] string? periodicityType,
+        [FromQuery] int? periodicityValue,
+        [FromQuery] string? goal
+    )
+    {
+        // Faked
+        return Result.Success();
     }
 }

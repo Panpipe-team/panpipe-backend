@@ -1,3 +1,3 @@
 namespace Panpipe.Controllers.Habits;
 
-public record ChangeHabitResultRequest(string Value);
+public record ChangeHabitResultRequest(string Value, string Comment);

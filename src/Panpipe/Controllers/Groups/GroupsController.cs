@@ -11,7 +11,7 @@ using Panpipe.Persistence.Identity;
 namespace Panpipe.Controllers.Groups;
 
 [ApiController]
-[Route("/api/v1/[controller]")]
+[Route("/api/v1.1/[controller]")]
 [Authorize]
 public class GroupsController(AppDbContext dbContext, UserManager<AppIdentityUser> userManager) : ControllerBase
 {
@@ -23,6 +23,8 @@ public class GroupsController(AppDbContext dbContext, UserManager<AppIdentityUse
     [TranslateResultToActionResult]
     public async Task<Result<GetGroupResponse>> GetGroup([FromRoute] Guid id)
     {
+        const string ReplacementForNullFullname = "";
+
         var group = await _dbContext.Groups
             .AsNoTracking()
             .Where(group => group.Id == id)
@@ -33,9 +35,24 @@ public class GroupsController(AppDbContext dbContext, UserManager<AppIdentityUse
             return Result.NotFound();
         }
 
-        return Result.Success(new GetGroupResponse(
-            group.Name, group.UserIds.Select(userId => new GetGroupResponseParticipant(userId)).ToList()
-        ));
+        var participants = new List<GetGroupResponseParticipant> ();
+
+        foreach (var userId in group.UserIds)
+        {
+            var user = await _userManager.FindByIdAsync(userId.ToString());
+
+            if (user is null)
+            {
+                return Result.CriticalError(
+                    $"Group with id {id} has participant with userId {userId}, " +
+                    "but user with this is cannot be found"
+                );
+            }
+
+            participants.Add(new GetGroupResponseParticipant(userId, user.FullName ?? ReplacementForNullFullname));
+        }
+
+        return Result.Success(new GetGroupResponse(group.Name, participants));
     }
 
     [HttpGet]
@@ -70,11 +87,38 @@ public class GroupsController(AppDbContext dbContext, UserManager<AppIdentityUse
             return Result.Unauthorized("Cannot find authorized user by claim");
         }
 
-        var group = new Group(Guid.NewGuid(), request.Name, user.Id);
+        var group = new Group(
+            Guid.NewGuid(), 
+            request.Name, 
+            user.Id, 
+            request.Participants.Select(participant => participant.UserId).ToList()
+        );
 
         _dbContext.Groups.Add(group);
         await _dbContext.SaveChangesAsync();
 
         return Result.Created(new CreateGroupResponse(group.Id));
     }
+
+    [HttpPost]
+    [Route("{groupId:guid}/participants")]
+    [TranslateResultToActionResult]
+    public async Task<Result> CreateGroupParticipant(
+        [FromRoute] Guid groupId, [FromBody] CreateGroupParticipantRequest request
+    )
+    {
+        // FAKED
+        return Result.Success();
+    }
+
+    [HttpDelete]
+    [Route("{groupId:guid}/participants")]
+    [TranslateResultToActionResult]
+    public async Task<Result> ExitGroup([FromRoute] Guid groupId)
+    {
+        // FAKED
+        return Result.Success();
+    }
+
+    
 }
