@@ -45,11 +45,19 @@ public class AppDbContext(DbContextOptions options): DbContext(options)
         modelBuilder.Entity<BooleanHabitResult>()
             .Property(x => x.Value)
             .IsRequired();
+        
+        modelBuilder.Entity<BooleanHabitResult>()
+            .Property(x => x.Comment)
+            .IsRequired(false);
 
         // FloatHabitResult
         modelBuilder.Entity<FloatHabitResult>()
             .Property(x => x.Value)
             .IsRequired();
+        
+        modelBuilder.Entity<FloatHabitResult>()
+            .Property(x => x.Comment)
+            .IsRequired(false);
 
         // Tag
         modelBuilder.Entity<Tag>()

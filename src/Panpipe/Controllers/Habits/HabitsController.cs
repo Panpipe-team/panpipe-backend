@@ -214,7 +214,7 @@ public class HabitsController(AppDbContext appDbContext, UserManager<AppIdentity
         var habit = habitWithHabitParamsSet.habit;
         var paramsSet = habitWithHabitParamsSet.paramsSet;
 
-        if (!paramsSet.ResultType.TryParse(request.Value, out var newResult))
+        if (!paramsSet.ResultType.TryParse(request.Value, request.Comment, out var newResult))
         {
             return Result.Invalid(new ValidationError(
                 $"Cannot parse string \'{request.Value}\' into habit result type \'{paramsSet.ResultType}\'"
