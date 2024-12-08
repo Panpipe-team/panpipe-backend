@@ -4,6 +4,7 @@ using Panpipe.Domain.Habit;
 using Panpipe.Domain.HabitOwner;
 using Panpipe.Domain.HabitParamsSet;
 using Panpipe.Domain.HabitResult;
+using Panpipe.Domain.Tags;
 
 namespace Panpipe.Persistence;
 
@@ -13,6 +14,7 @@ public class AppDbContext(DbContextOptions options): DbContext(options)
 
     public DbSet<Group> Groups { get; set; }
     public DbSet<HabitParamsSet> HabitParamsSets { get; set; }
+    public DbSet<Tag> Tags { get; set; }
     public DbSet<AbstractHabitResult> AbstractHabitResults { get; set; }
     public DbSet<Habit> Habits { get; set; }
     public DbSet<HabitMark> HabitMarks { get; set; }
@@ -46,11 +48,24 @@ public class AppDbContext(DbContextOptions options): DbContext(options)
         modelBuilder.Entity<FloatHabitResult>()
             .Property(x => x.Value)
             .IsRequired();
+
+        // Tag
+        modelBuilder.Entity<Tag>()
+            .Property(x => x.Name)
+            .IsRequired();
             
         // HabitParamsSet
         modelBuilder.Entity<HabitParamsSet>()
             .Property(x => x.Name)
             .IsRequired();
+
+        modelBuilder.Entity<HabitParamsSet>()
+            .Property(x => x.Description)
+            .IsRequired();
+
+        modelBuilder.Entity<HabitParamsSet>()
+            .HasMany(x => x.Tags)
+            .WithMany();
         
         modelBuilder.Entity<HabitParamsSet>()
             .HasOne(x => x.Goal)
