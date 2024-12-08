@@ -7,7 +7,7 @@ using Panpipe.Persistence.Identity;
 namespace Panpipe.Controllers.Auth;
 
 [ApiController]
-[Route("/api/v1")]
+[Route("/api/v1.1")]
 public class AuthController: ControllerBase
 {
     private readonly UserManager<AppIdentityUser> _userManager;
@@ -36,7 +36,7 @@ public class AuthController: ControllerBase
             return Result.Conflict($"User with login \"{username}\" already exists");
         }
 
-        var user = new AppIdentityUser(username, null);
+        var user = new AppIdentityUser(username, request.Name);
 
         var result = await _userManager.CreateAsync(user, request.Password);
 
