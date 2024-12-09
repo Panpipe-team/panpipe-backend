@@ -110,6 +110,12 @@ public class AppDbContext(DbContextOptions options): DbContext(options)
             .IsRequired();
         
         modelBuilder.Entity<HabitCollection>()
+            .HasOne<Group>()
+            .WithMany()
+            .HasForeignKey(x => x.GroupId)
+            .IsRequired();
+        
+        modelBuilder.Entity<HabitCollection>()
             .Property(x => x.HabitIds)
             .IsRequired();
         
