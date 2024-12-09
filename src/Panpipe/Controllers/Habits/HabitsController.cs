@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Panpipe.Controllers.Habits.Helpers;
 using Panpipe.Controllers.Helpers;
 using Panpipe.Domain.HabitResult;
 using Panpipe.Persistence;

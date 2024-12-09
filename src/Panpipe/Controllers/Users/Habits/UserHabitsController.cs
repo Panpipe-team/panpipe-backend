@@ -4,7 +4,11 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Panpipe.Controllers.Habits.Helpers;
+using Panpipe.Controllers.Helpers;
+using Panpipe.Domain.Habit;
+using Panpipe.Domain.HabitOwner;
+using Panpipe.Domain.HabitParamsSet;
+using Panpipe.Domain.HabitResult;
 using Panpipe.Persistence;
 using Panpipe.Persistence.Identity;
 
@@ -13,7 +17,7 @@ namespace Panpipe.Controllers.Users.Habits;
 [ApiController]
 [Route("/api/v1.1/users/habits")]
 [Authorize]
-public class UsersHabitsController(AppDbContext appDbContext, UserManager<AppIdentityUser> userManager): ControllerBase
+public class UserHabitsController(AppDbContext appDbContext, UserManager<AppIdentityUser> userManager): ControllerBase
 {
     private readonly AppDbContext _appDbContext = appDbContext;
     private readonly UserManager<AppIdentityUser> _userManager = userManager;
@@ -63,7 +67,7 @@ public class UsersHabitsController(AppDbContext appDbContext, UserManager<AppIde
             result.Select(habitInfo => new GetUserHabitsResponseHabit(
                 habitInfo.Id,
                 habitInfo.Name,
-                Helpers.Periodicity.FromFrequency(habitInfo.Frequency),
+                Periodicity.FromFrequency(habitInfo.Frequency),
                 habitInfo.Goal.ToReadableString(),
                 habitInfo.ResultType.ToString()
             )).ToList()
@@ -112,7 +116,7 @@ public class UsersHabitsController(AppDbContext appDbContext, UserManager<AppIde
             result.Name,
             result.Description,
             result.Tags.Select(tag => tag.Name).ToList(),
-            Helpers.Periodicity.FromFrequency(result.Frequency),
+            Periodicity.FromFrequency(result.Frequency),
             result.Goal.ToReadableString(),
             result.ResultType.ToString(),
             result.IsPublicTemplate,
@@ -130,10 +134,119 @@ public class UsersHabitsController(AppDbContext appDbContext, UserManager<AppIde
 
     [HttpPost]
     [TranslateResultToActionResult]
-    public async Task<Result<CreateUserHabitResponse>> Create([FromQuery] Guid? templateId)
+    public async Task<Result<CreateUserHabitResponse>> Create(
+        [FromQuery] Guid? templateId, [FromBody] CreateUserHabitRequest? request
+    )
     {
-        // FAKED
-        return Result.Success(new CreateUserHabitResponse(Guid.Empty));
+        var user = await _userManager.GetUserAsync(User);
+
+        if (user is null)
+        {
+            return Result.Unauthorized("Cannot find authorized user by claim");
+        }
+
+        Guid habitParamsSetId;
+
+        if (request is not null)
+        {
+            if (templateId is not null)  
+            {
+                return Result.Invalid(new ValidationError(
+                    "TemplateId from query and habit parameters in non-null body cannot be specified simultaneously"
+                ));
+            }
+
+            var tags = await _appDbContext.Tags
+                .AsNoTracking()
+                .Where(tag => request.Tags.Contains(tag.Id))
+                .ToListAsync();
+
+            var habitResultTypeResult = HabitResultTypeParser.Parse(request.ResultType);
+
+            if (habitResultTypeResult.IsInvalid())
+            {
+                return Result.Invalid(habitResultTypeResult.ValidationErrors);
+            }
+
+            var habitResultType = habitResultTypeResult.Value;
+
+            string? goalComment = null;
+
+            var goalParsedSuccessfully = habitResultType.TryParse(request.Goal, goalComment, out var goal);
+
+            if (!goalParsedSuccessfully)
+            {
+                return Result.Invalid(new ValidationError($"Goal \"{request.Goal}\" cannot be parsed"));
+            }
+
+            var frequencyResult = request.Periodicity.ToFrequency();
+
+            if (frequencyResult.IsInvalid())
+            {
+                return Result.Invalid(frequencyResult.ValidationErrors);
+            }
+
+            var frequency = frequencyResult.Value;
+
+            const bool isPublicTemplate = false;
+
+            var newHabitParamsSet = new HabitParamsSet(
+                Guid.NewGuid(),
+                request.Name,
+                request.Description,
+                tags,
+                goal,
+                frequency,
+                isPublicTemplate
+            );
+
+            _appDbContext.HabitParamsSets.Add(newHabitParamsSet);
+
+            await _appDbContext.SaveChangesAsync();
+
+            habitParamsSetId = newHabitParamsSet.Id;
+        }
+        else {
+            if (templateId is null)
+            {
+                return Result.Invalid(new ValidationError(
+                    "Exactly one of templateId from query and habit parameters in non-null body must be specified, " +
+                    "not none of them"
+                ));
+            }
+
+            habitParamsSetId = templateId.Value;
+        }
+
+        var habitParamsSet = await _appDbContext.HabitParamsSets
+            .AsNoTracking()
+            .Where(x => x.Id == habitParamsSetId)
+            .FirstOrDefaultAsync();
+
+        if (habitParamsSet is null)
+        {
+            return Result.Invalid(new ValidationError($"Not found habit params template with id {habitParamsSetId}"));
+        }
+
+        var habit = new Habit(Guid.NewGuid(), habitParamsSetId);
+
+        _appDbContext.Habits.Add(habit);
+
+        var userHabitOwner = new UserHabitOwner(Guid.NewGuid(), user.Id, habit.Id);
+
+        _appDbContext.UserHabitOwners.Add(userHabitOwner);
+
+        var emptyMarksTimestamps = habitParamsSet.CalculateTimestampsOfEmptyMarksForNewlyCreatedHabit();
+
+        foreach (var timestamp in emptyMarksTimestamps)
+        {
+            var emptyMark = HabitMark.CreateEmpty(Guid.NewGuid(), timestamp);
+            habit.AddEmptyMark(emptyMark);
+        }
+
+        await _appDbContext.SaveChangesAsync();
+
+        return Result.Created(new CreateUserHabitResponse(habit.Id));
     }
 
     [HttpGet]
