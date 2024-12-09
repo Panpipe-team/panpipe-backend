@@ -19,8 +19,6 @@ public class UsersController(UserManager<AppIdentityUser> userManager): Controll
     [TranslateResultToActionResult]
     public async Task<Result<GetUserByIdResponse>> GetById([FromRoute] Guid id)
     {
-        const string ReplacementForNullName = "";
-
         var user = await _userManager.FindByIdAsync(id.ToString());
 
         if (user is null)
@@ -35,14 +33,20 @@ public class UsersController(UserManager<AppIdentityUser> userManager): Controll
 
         var userName = user.UserName;
 
-        return Result.Success(user).Map(user => new GetUserByIdResponse(userName, user.FullName ?? ReplacementForNullName));
+        return Result.Success(new GetUserByIdResponse(userName, user.FullName));
     }
 
     [HttpGet]
     [TranslateResultToActionResult]
     public async Task<Result<GetUserByLoginResponse>> GetByLogin([FromQuery] string login)
     {
-        // FAKED
-        return Result.Success().Map(_ => new GetUserByLoginResponse(Guid.Empty, $"Faked user name with login {login}"));
+        var result = await _userManager.FindByNameAsync(login);
+
+        if (result is null)
+        {
+            return Result.NotFound();
+        }
+
+        return Result.Success(new GetUserByLoginResponse(result.Id, result.FullName));
     }
 }
