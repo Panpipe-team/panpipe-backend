@@ -129,16 +129,70 @@ public class HabitsController(AppDbContext appDbContext, UserManager<AppIdentity
 
     [HttpPut]
     [Route("{habitId:guid}/parameters")]
+    [TranslateResultToActionResult]
     public async Task<Result> ChangeHabitParams(
         [FromRoute] Guid habitId,
         [FromQuery] string? name,
         [FromQuery] string? description,
-        [FromQuery] string? periodicityType,
-        [FromQuery] int? periodicityValue,
         [FromQuery] string? goal
     )
     {
-        // Faked
+        var habitParamsSet = await _appDbContext.Habits
+            .Where(habit => habit.Id == habitId)
+            .Join(
+                _appDbContext.HabitParamsSets
+                    .Include(habit => habit.Goal),
+                habit => habit.ParamsSetId,
+                paramsSet => paramsSet.Id,
+                (habit, paramsSet) => new 
+                {
+                    paramsSet
+                }
+            )
+            .FirstOrDefaultAsync();
+        
+        if (habitParamsSet is null)
+        {
+            return Result.NotFound($"Habit with id {habitId} and its' params set were not found together");
+        }
+
+        var paramsSet = habitParamsSet.paramsSet;
+
+        if (paramsSet.IsPublicTemplate)
+        {
+            return Result.Invalid(new ValidationError(
+                $"Cannot change parameters of templated habit with id {habitId}"
+            ));
+        }
+
+        if (name is not null)
+        {
+            paramsSet.SetName(name);
+        }
+
+        if (description is not null)
+        {
+            paramsSet.SetDescription(description);
+        }
+
+        if (goal is not null)
+        {
+            const string GoalComment = "";
+            
+            var parseResult = paramsSet.ResultType.TryParse(goal, GoalComment, out var newGoal);
+
+            if (!parseResult)
+            {
+                return Result.Invalid(new ValidationError($"Cannot parse goal \"{goal}\""));
+            }
+
+            paramsSet.SetGoal(newGoal);
+
+            _appDbContext.AbstractHabitResults.Add(newGoal);
+        }
+
+        await _appDbContext.SaveChangesAsync();
+
         return Result.Success();
     }
 }
