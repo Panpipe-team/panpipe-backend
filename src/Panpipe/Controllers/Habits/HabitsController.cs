@@ -83,6 +83,13 @@ public class HabitsController(AppDbContext appDbContext, UserManager<AppIdentity
         [FromRoute] Guid habitId, [FromRoute] Guid markId, [FromBody] ChangeHabitResultRequest request
     )
     {
+        var user = await _userManager.GetUserAsync(User);
+
+        if (user is null)
+        {
+            return Result.Unauthorized("Cannot find authorized user by claim");
+        }
+
         var habitWithHabitParamsSet = await _appDbContext.Habits
             .Where(habit => habit.Id == habitId)
             .Include(habit => habit.Marks)
@@ -102,7 +109,49 @@ public class HabitsController(AppDbContext appDbContext, UserManager<AppIdentity
         
         if (habitWithHabitParamsSet is null)
         {
-            return Result.NotFound($"Habit with id {habitId} or its' params set is not found");
+            var habitCollection = await _appDbContext.HabitCollections
+                .Where(habitCollection => habitCollection.Id == habitId)
+                .FirstOrDefaultAsync();
+            
+            if (habitCollection is null)
+            {
+                return Result.NotFound($"Habit with id {habitId} or its' params set is not found");
+            }
+            
+            habitWithHabitParamsSet = await _appDbContext.GroupUserHabitOwners
+                .Where(habitOwner => 
+                    habitOwner.UserId == user.Id && habitCollection.HabitIds.Contains(habitOwner.HabitId))
+                .Join(
+                    _appDbContext.Habits
+                        .Include(habit => habit.Marks)
+                            .ThenInclude(habitMark => habitMark.Result),
+                    habitOwner => habitOwner.HabitId,
+                    habit => habit.Id,
+                    (habitOwner, habit) => new 
+                    {
+                        habit
+                    }
+                )
+                .Join(
+                    _appDbContext.HabitParamsSets
+                        .Include(habitParamsSet => habitParamsSet.Goal),
+                    habitInfo => habitInfo.habit.ParamsSetId,
+                    paramsSet => paramsSet.Id,
+                    (habitInfo, paramsSet) => new 
+                    {
+                        habitInfo.habit,
+                        paramsSet
+                    }
+                )
+                .FirstOrDefaultAsync();
+            
+            if (habitWithHabitParamsSet is null)
+            {
+                return Result.CriticalError(
+                    $"Cannot find personal habit for user with id {user.Id} " +
+                    "in group with id {groupId} for group habit with id {habitId}"
+                );
+            }
         }
 
         var habit = habitWithHabitParamsSet.habit;
