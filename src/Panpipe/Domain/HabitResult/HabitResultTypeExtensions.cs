@@ -3,7 +3,7 @@ namespace Panpipe.Domain.HabitResult;
 public static class HabitResultTypeExtensions
 {
     public static bool TryParse(
-        this HabitResultType resultType, string s, string? comment, out AbstractHabitResult result
+        this HabitResultType resultType, string s, string comment, out AbstractHabitResult result
     )
     {
         return resultType switch

@@ -48,7 +48,7 @@ public class AppDbContext(DbContextOptions options): DbContext(options)
         
         modelBuilder.Entity<BooleanHabitResult>()
             .Property(x => x.Comment)
-            .IsRequired(false);
+            .IsRequired();
 
         // FloatHabitResult
         modelBuilder.Entity<FloatHabitResult>()

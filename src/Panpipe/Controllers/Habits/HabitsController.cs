@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Panpipe.Controllers.Habits.Helpers;
 using Panpipe.Controllers.Helpers;
 using Panpipe.Domain.HabitResult;
 using Panpipe.Persistence;
@@ -50,11 +49,12 @@ public class HabitsController(AppDbContext appDbContext, UserManager<AppIdentity
     [TranslateResultToActionResult]
     public async Task<Result<GetTagsResponse>> GetAllTags()
     {
-        // FAKED
+        var tags = await _appDbContext.Tags
+            .AsNoTracking()
+            .ToListAsync();
+
         return Result.Success(new GetTagsResponse(
-            [
-                new GetTagsResponseTag(Guid.Empty, "Faked tag name")
-            ]
+            tags.Select(tag => new GetTagsResponseTag(tag.Id, tag.Name)).ToList()
         ));
     }
 
@@ -63,8 +63,17 @@ public class HabitsController(AppDbContext appDbContext, UserManager<AppIdentity
     [TranslateResultToActionResult]
     public async Task<Result<GetTagResponse>> GetTagById([FromRoute] Guid id)
     {
-        // FAKED
-        return Result.Success(new GetTagResponse("Faked tag name 2"));
+        var tag = await _appDbContext.Tags
+            .AsNoTracking()
+            .Where(tag => tag.Id == id)
+            .FirstOrDefaultAsync();
+        
+        if (tag is null)
+        {
+            return Result.NotFound($"Tag with id {id} was not found");
+        }
+
+        return Result.Success(new GetTagResponse(tag.Name));
     }   
 
     [HttpPut]
@@ -120,16 +129,70 @@ public class HabitsController(AppDbContext appDbContext, UserManager<AppIdentity
 
     [HttpPut]
     [Route("{habitId:guid}/parameters")]
+    [TranslateResultToActionResult]
     public async Task<Result> ChangeHabitParams(
         [FromRoute] Guid habitId,
         [FromQuery] string? name,
         [FromQuery] string? description,
-        [FromQuery] string? periodicityType,
-        [FromQuery] int? periodicityValue,
         [FromQuery] string? goal
     )
     {
-        // Faked
+        var habitParamsSet = await _appDbContext.Habits
+            .Where(habit => habit.Id == habitId)
+            .Join(
+                _appDbContext.HabitParamsSets
+                    .Include(habit => habit.Goal),
+                habit => habit.ParamsSetId,
+                paramsSet => paramsSet.Id,
+                (habit, paramsSet) => new 
+                {
+                    paramsSet
+                }
+            )
+            .FirstOrDefaultAsync();
+        
+        if (habitParamsSet is null)
+        {
+            return Result.NotFound($"Habit with id {habitId} and its' params set were not found together");
+        }
+
+        var paramsSet = habitParamsSet.paramsSet;
+
+        if (paramsSet.IsPublicTemplate)
+        {
+            return Result.Invalid(new ValidationError(
+                $"Cannot change parameters of templated habit with id {habitId}"
+            ));
+        }
+
+        if (name is not null)
+        {
+            paramsSet.SetName(name);
+        }
+
+        if (description is not null)
+        {
+            paramsSet.SetDescription(description);
+        }
+
+        if (goal is not null)
+        {
+            const string GoalComment = "";
+            
+            var parseResult = paramsSet.ResultType.TryParse(goal, GoalComment, out var newGoal);
+
+            if (!parseResult)
+            {
+                return Result.Invalid(new ValidationError($"Cannot parse goal \"{goal}\""));
+            }
+
+            paramsSet.SetGoal(newGoal);
+
+            _appDbContext.AbstractHabitResults.Add(newGoal);
+        }
+
+        await _appDbContext.SaveChangesAsync();
+
         return Result.Success();
     }
 }
