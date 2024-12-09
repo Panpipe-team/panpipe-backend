@@ -165,9 +165,9 @@ public class UserHabitsController(AppDbContext appDbContext, UserManager<AppIden
 
             var habitResultType = habitResultTypeResult.Value;
 
-            string? goalComment = null;
+            const string GoalComment = "";
 
-            var goalParsedSuccessfully = habitResultType.TryParse(request.Goal, goalComment, out var goal);
+            var goalParsedSuccessfully = habitResultType.TryParse(request.Goal, GoalComment, out var goal);
 
             if (!goalParsedSuccessfully)
             {
@@ -249,65 +249,8 @@ public class UserHabitsController(AppDbContext appDbContext, UserManager<AppIden
     [TranslateResultToActionResult]
     public async Task<Result<GetUserHabitStatistics>> GetStatistics([FromRoute] Guid habitId)
     {
-        var user = await _userManager.GetUserAsync(User);
+        var result = await CommonOperations.GetAnonymousStatistics(_appDbContext, habitId);
 
-        if (user is null)
-        {
-            return Result.Unauthorized("Cannot find authorized user by claim");
-        }
-
-        var currentUserHabit = await _appDbContext.Habits
-            .AsNoTracking()
-            .Include(habit => habit.Marks)
-                .ThenInclude(habitMark => habitMark.Result)
-            .Where(habit => habit.Id == habitId)
-            .FirstOrDefaultAsync();
-        
-        if (currentUserHabit is null)
-        {
-            return Result.NotFound($"Habit with id {habitId} was not found");
-        }
-
-        var habitParamsSet = await _appDbContext.HabitParamsSets
-            .AsNoTracking()
-            .Include(habitParamsSet => habitParamsSet.Goal)
-            .Where(habitParamsSet => habitParamsSet.Id == currentUserHabit.ParamsSetId)
-            .FirstOrDefaultAsync();
-        
-        if (habitParamsSet is null)
-        {
-            return Result.CriticalError($"Habit params set with id {currentUserHabit.ParamsSetId} cannot be found");
-        }
-
-        var allHabitsExceptCurrentWithSameParams = await _appDbContext.Habits
-            .AsNoTracking()
-            .Include(habit => habit.Marks)
-                .ThenInclude(habitMark => habitMark.Result)
-            .Where(habit => habit.ParamsSetId == habitParamsSet.Id && habit.Id != habitId)
-            .ToListAsync();
-        
-        var goal = habitParamsSet.Goal;
-
-        var currentUserStreak = currentUserHabit.GetStreak(goal);
-
-        if (currentUserStreak == 0)
-        {
-            return Result.Success(new GetUserHabitStatistics(0));
-        }
-        
-        var otherUsersStreaks = allHabitsExceptCurrentWithSameParams.Select(habit => habit.GetStreak(goal)).ToList();
-
-        if (otherUsersStreaks.Count == 0)
-        {
-            const int betterThanEverybodyAsThereIsNobody = 1;
-
-            return Result.Success(new GetUserHabitStatistics(betterThanEverybodyAsThereIsNobody));
-        }
-
-        var countCurrentUserBetterStreak = otherUsersStreaks.Count(otherStreak => currentUserStreak >= otherStreak);
-
-        var currentUserBetterStreakProportion = (float) (countCurrentUserBetterStreak + 1) / (otherUsersStreaks.Count + 1);
-
-        return Result.Success(new GetUserHabitStatistics(currentUserBetterStreakProportion));
+        return result.Map(value => new GetUserHabitStatistics(value));
     }
 }

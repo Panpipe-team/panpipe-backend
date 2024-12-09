@@ -5,8 +5,10 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Panpipe.Controllers.Helpers;
-using Panpipe.Domain.Group;
+using Panpipe.Domain.Habit;
+using Panpipe.Domain.HabitOwner;
 using Panpipe.Domain.HabitParamsSet;
+using Panpipe.Domain.HabitResult;
 using Panpipe.Persistence;
 using Panpipe.Persistence.Identity;
 
@@ -19,23 +21,52 @@ public class GroupCommonHabitsController(
     AppDbContext dbContext, UserManager<AppIdentityUser> userManager
 ) : ControllerBase
 {
-    private readonly AppDbContext _dbContext = dbContext;
+    private readonly AppDbContext _appDbContext = dbContext;
     private readonly UserManager<AppIdentityUser> _userManager = userManager;
 
     [HttpGet]
     [TranslateResultToActionResult]
     public async Task<Result<GetGroupCommonHabitsResponse>> GetAll([FromRoute] Guid groupId)
     {
-        // FAKED
-        return Result.Success(new GetGroupCommonHabitsResponse([
-            new GetGroupCommonHabitsResponseHabit(
-                Guid.Empty,
-                "Faked group common habit name 1",
-                Periodicity.FromFrequency(new Frequency(IntervalType.Day, 1)),
-                "36.6",
-                "Float"
+        var result = await _appDbContext.GroupHabitOwners
+            .AsNoTracking()
+            .Where(x => x.GroupId == groupId)
+            .Join(
+                _appDbContext.Habits
+                    .AsNoTracking(),
+                groupHabitOwner => groupHabitOwner.HabitId,
+                habit => habit.Id,
+                (groupHabitOwner, habit) => new
+                {
+                    habit.Id,
+                    habit.ParamsSetId
+                }
             )
-        ]));
+            .Join(
+                _appDbContext.HabitParamsSets
+                    .AsNoTracking()
+                    .Include(x => x.Goal),
+                habitIdAndHabitParamsSetId => habitIdAndHabitParamsSetId.ParamsSetId,
+                paramsSet => paramsSet.Id,
+                (habitIdAndHabitParamsSetId, paramsSet) => new {
+                    habitIdAndHabitParamsSetId.Id,
+                    paramsSet.Name,
+                    paramsSet.Frequency,
+                    paramsSet.Goal,
+                    paramsSet.ResultType
+                }
+            )
+            .ToListAsync();
+
+        return Result.Success(new GetGroupCommonHabitsResponse(
+            result.Select(habitInfo => new GetGroupCommonHabitsResponseHabit(
+                habitInfo.Id,
+                habitInfo.Name,
+                Periodicity.FromFrequency(habitInfo.Frequency),
+                habitInfo.Goal.ToReadableString(),
+                habitInfo.ResultType.ToString()
+            )).ToList()
+        ));
     }
 
     [HttpGet]
@@ -43,28 +74,53 @@ public class GroupCommonHabitsController(
     [TranslateResultToActionResult]
     public async Task<Result<GetGroupCommonHabitResponse>> GetById([FromRoute] Guid groupId, [FromRoute] Guid habitId)
     {
-        // FAKED
+        var result = await _appDbContext.Habits
+            .AsNoTracking()
+            .Where(x => x.Id == habitId)
+            .Include(x => x.Marks)
+                .ThenInclude(x => x.Result)
+            .Join(
+                _appDbContext.HabitParamsSets
+                    .AsNoTracking()
+                    .Include(x => x.Goal)
+                    .Include(x => x.Tags),
+                habit => habit.ParamsSetId,
+                paramsSet => paramsSet.Id,
+                (habit, paramsSet) => new 
+                {
+                    paramsSet.Name,
+                    paramsSet.Description,
+                    paramsSet.Tags,
+                    paramsSet.Frequency,
+                    paramsSet.Goal,
+                    paramsSet.ResultType,
+                    paramsSet.IsPublicTemplate,
+                    habit.Marks
+                }
+            )
+            .FirstOrDefaultAsync();
+        
+        if (result is null)
+        {
+            return Result.NotFound();
+        }
+        
         return Result.Success(new GetGroupCommonHabitResponse(
-            Guid.Empty,
-            "Faked group common habit name 2",
-            "Faked group common habit description 2",
-            ["Faked tag 1", "Faked tag 2"],
-            Periodicity.FromFrequency(new Frequency(IntervalType.Day, 1)),
-            "36.6",
-            "Float",
-            false,
-            [
-                new GetGroupCommonHabitResponseMark(
-                    Guid.Empty, 
-                    DateTime.UtcNow, 
-                    new GetGroupCommonHabitResponseResult_("38.5", "Лан, шучу, не болею")
-                ),
-                new GetGroupCommonHabitResponseMark(
-                    Guid.Empty, 
-                    DateTime.UtcNow, 
-                    null
-                )
-            ]
+            habitId,
+            result.Name,
+            result.Description,
+            result.Tags.Select(tag => tag.Name).ToList(),
+            Periodicity.FromFrequency(result.Frequency),
+            result.Goal.ToReadableString(),
+            result.ResultType.ToString(),
+            result.IsPublicTemplate,
+            result.Marks.Select(mark => new GetGroupCommonHabitResponseMark(
+                mark.Id, 
+                mark.TimestampUtc.UtcDateTime,
+                mark.Result is null 
+                    ? null 
+                    : new GetGroupCommonHabitResponseResult_(mark.Result.ToReadableString(), mark.Result.Comment) 
+            )).ToList()
         ));
     }
 
@@ -76,8 +132,107 @@ public class GroupCommonHabitsController(
         [FromBody] CreateGroupCommonHabitRequest? request
     )
     {
-        // FAKED
-        return Result.Success(new CreateGroupCommonHabitResponse(Guid.Empty));
+        Guid habitParamsSetId;
+
+        if (request is not null)
+        {
+            if (templateId is not null)  
+            {
+                return Result.Invalid(new ValidationError(
+                    "TemplateId from query and habit parameters in non-null body cannot be specified simultaneously"
+                ));
+            }
+
+            var tags = await _appDbContext.Tags
+                .Where(tag => request.Tags.Contains(tag.Id))
+                .ToListAsync();
+
+            var habitResultTypeResult = HabitResultTypeParser.Parse(request.ResultType);
+
+            if (habitResultTypeResult.IsInvalid())
+            {
+                return Result.Invalid(habitResultTypeResult.ValidationErrors);
+            }
+
+            var habitResultType = habitResultTypeResult.Value;
+
+            const string GoalComment = "";
+
+            var goalParsedSuccessfully = habitResultType.TryParse(request.Goal, GoalComment, out var goal);
+
+            if (!goalParsedSuccessfully)
+            {
+                return Result.Invalid(new ValidationError($"Goal \"{request.Goal}\" cannot be parsed"));
+            }
+
+            var frequencyResult = request.Periodicity.ToFrequency();
+
+            if (frequencyResult.IsInvalid())
+            {
+                return Result.Invalid(frequencyResult.ValidationErrors);
+            }
+
+            var frequency = frequencyResult.Value;
+
+            const bool isPublicTemplate = false;
+
+            var newHabitParamsSet = new HabitParamsSet(
+                Guid.NewGuid(),
+                request.Name,
+                request.Description,
+                tags,
+                goal,
+                frequency,
+                isPublicTemplate
+            );
+
+            _appDbContext.HabitParamsSets.Add(newHabitParamsSet);
+
+            await _appDbContext.SaveChangesAsync();
+
+            habitParamsSetId = newHabitParamsSet.Id;
+        }
+        else {
+            if (templateId is null)
+            {
+                return Result.Invalid(new ValidationError(
+                    "Exactly one of templateId from query and habit parameters in non-null body must be specified, " +
+                    "not none of them"
+                ));
+            }
+
+            habitParamsSetId = templateId.Value;
+        }
+
+        var habitParamsSet = await _appDbContext.HabitParamsSets
+            .AsNoTracking()
+            .Where(x => x.Id == habitParamsSetId)
+            .FirstOrDefaultAsync();
+
+        if (habitParamsSet is null)
+        {
+            return Result.Invalid(new ValidationError($"Not found habit params template with id {habitParamsSetId}"));
+        }
+
+        var habit = new Habit(Guid.NewGuid(), habitParamsSetId);
+
+        _appDbContext.Habits.Add(habit);
+
+        var groupHabitOwner = new GroupHabitOwner(Guid.NewGuid(), groupId, habit.Id);
+
+        _appDbContext.GroupHabitOwners.Add(groupHabitOwner);
+
+        var emptyMarksTimestamps = habitParamsSet.CalculateTimestampsOfEmptyMarksForNewlyCreatedHabit();
+
+        foreach (var timestamp in emptyMarksTimestamps)
+        {
+            var emptyMark = HabitMark.CreateEmpty(Guid.NewGuid(), timestamp);
+            habit.AddEmptyMark(emptyMark);
+        }
+
+        await _appDbContext.SaveChangesAsync();
+
+        return Result.Created(new CreateGroupCommonHabitResponse(habit.Id));
     }
 
     [HttpGet]
@@ -87,7 +242,8 @@ public class GroupCommonHabitsController(
         [FromRoute] Guid groupId, [FromRoute] Guid habitId
     )
     {
-        // FAKED
-        return Result.Success(new GetGroupCommonHabitStatisticsResponse(0.366f));
+        var result = await CommonOperations.GetAnonymousStatistics(_appDbContext, habitId);
+
+        return result.Map(value => new GetGroupCommonHabitStatisticsResponse(value));
     }
 }
