@@ -21,4 +21,14 @@ public class BooleanHabitResult(Guid id, bool value, string comment): AbstractHa
 
         return true;
     }
+
+    public override bool IsAchievedBy(AbstractHabitResult otherResult)
+    {
+        if (otherResult is BooleanHabitResult otherBoolResult)
+        {
+            return otherBoolResult.Value;
+        }
+
+        return false; // Better throw exception here or return bad result
+    }
 }

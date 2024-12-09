@@ -21,4 +21,14 @@ public class FloatHabitResult(Guid id, float value, string comment): AbstractHab
 
         return true;
     }
+
+    public override bool IsAchievedBy(AbstractHabitResult otherResult)
+    {
+        if (otherResult is FloatHabitResult otherFloatResult)
+        {
+            return otherFloatResult.Value >= Value;
+        }
+
+        return false; // Better throw exception here or return bad result
+    }
 }
