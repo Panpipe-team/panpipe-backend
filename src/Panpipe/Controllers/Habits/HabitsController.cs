@@ -148,8 +148,7 @@ public class HabitsController(AppDbContext appDbContext, UserManager<AppIdentity
             if (habitWithHabitParamsSet is null)
             {
                 return Result.CriticalError(
-                    $"Cannot find personal habit for user with id {user.Id} " +
-                    "in group with id {groupId} for group habit with id {habitId}"
+                    $"Cannot find personal habit for user with id {user.Id} for group habit with id {habitId}"
                 );
             }
         }
@@ -202,7 +201,28 @@ public class HabitsController(AppDbContext appDbContext, UserManager<AppIdentity
         
         if (habitParamsSet is null)
         {
-            return Result.NotFound($"Habit with id {habitId} and its' params set were not found together");
+            var habitCollection = await _appDbContext.HabitCollections
+                .Where(habitCollection => habitCollection.Id == habitId)
+                .FirstOrDefaultAsync();
+            
+            if (habitCollection is null)
+            {
+                return Result.NotFound($"Habit with id {habitId} or its' params set is not found");
+            }
+            
+            habitParamsSet = await _appDbContext.HabitParamsSets
+                .Include(habitParamsSet => habitParamsSet.Goal)
+                .Where(habitParamsSet => habitParamsSet.Id == habitCollection.ParamsSetId)
+                .Select(habitParamsSet => new { paramsSet = habitParamsSet })
+                .FirstOrDefaultAsync();
+            
+            if (habitParamsSet is null)
+            {
+                return Result.CriticalError(
+                    $"Cannot find habit params set with id {habitCollection.ParamsSetId} " +
+                    $"for group habit with id {habitId}"
+                );
+            }
         }
 
         var paramsSet = habitParamsSet.paramsSet;
