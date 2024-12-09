@@ -79,8 +79,6 @@ public class UserHabitsController(AppDbContext appDbContext, UserManager<AppIden
     [TranslateResultToActionResult]
     public async Task<Result<GetUserHabitByIdResponse>> GetById([FromRoute] Guid id)
     {
-        const string ReplacementForNullComment = "";
-
         var result = await _appDbContext.Habits
             .AsNoTracking()
             .Where(x => x.Id == id)
@@ -125,9 +123,7 @@ public class UserHabitsController(AppDbContext appDbContext, UserManager<AppIden
                 mark.TimestampUtc.UtcDateTime,
                 mark.Result is null 
                     ? null 
-                    : new GetUserHabitByIdResponseMarkResult(
-                        mark.Result.ToReadableString(), mark.Result.Comment ?? ReplacementForNullComment
-                    ) 
+                    : new GetUserHabitByIdResponseMarkResult(mark.Result.ToReadableString(), mark.Result.Comment) 
             )).ToList()
         ));
     }

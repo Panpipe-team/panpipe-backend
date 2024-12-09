@@ -1,12 +1,12 @@
 namespace Panpipe.Domain.HabitResult;
 
-public class FloatHabitResult(Guid id, float value, string? comment): AbstractHabitResult(id, comment)
+public class FloatHabitResult(Guid id, float value, string comment): AbstractHabitResult(id, comment)
 {
     public float Value { get; init; } = value;
 
     public override HabitResultType Type => HabitResultType.Float;
 
-    public static bool TryParse(string s, string? comment, out AbstractHabitResult result)
+    public static bool TryParse(string s, string comment, out AbstractHabitResult result)
     {
         var isSuccessful = float.TryParse(s, out var tmp);
 
