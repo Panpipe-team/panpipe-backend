@@ -21,11 +21,14 @@ public class Group
 
     public IList<Guid> UserIds => userIds.AsReadOnly();
 
-    private void AddUserId(Guid userId)
+    public void AddUserId(Guid userId)
     {
-        if (userIds.Contains(userId))
+        if (!userIds.Contains(userId))
         {
             userIds.Add(userId);
         }
     }
+
+    public void RemoveUserId(Guid userId)
+        => userIds.Remove(userId);
 }
