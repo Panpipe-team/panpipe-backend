@@ -1,5 +1,6 @@
 using Panpipe.Domain.HabitParamsSet;
 using Panpipe.Domain.HabitResult;
+using Panpipe.Domain.Tags;
 
 namespace Panpipe.Persistence;
 
@@ -7,6 +8,14 @@ public static class AppDbContextSeed
 {
     public static async Task SeedAsync(AppDbContext context)
     { 
+        await context.Tags.AddRangeAsync(
+            new List<Tag>
+            {
+                new (Guid.NewGuid(), "Полезная привычка"),
+                new (Guid.NewGuid(), "Вредная привычка")
+            }
+        );
+
         await context.HabitParamsSets.AddRangeAsync(
             new List<HabitParamsSet> 
             {

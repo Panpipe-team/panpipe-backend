@@ -49,11 +49,12 @@ public class HabitsController(AppDbContext appDbContext, UserManager<AppIdentity
     [TranslateResultToActionResult]
     public async Task<Result<GetTagsResponse>> GetAllTags()
     {
-        // FAKED
+        var tags = await _appDbContext.Tags
+            .AsNoTracking()
+            .ToListAsync();
+
         return Result.Success(new GetTagsResponse(
-            [
-                new GetTagsResponseTag(Guid.Empty, "Faked tag name")
-            ]
+            tags.Select(tag => new GetTagsResponseTag(tag.Id, tag.Name)).ToList()
         ));
     }
 
@@ -62,8 +63,17 @@ public class HabitsController(AppDbContext appDbContext, UserManager<AppIdentity
     [TranslateResultToActionResult]
     public async Task<Result<GetTagResponse>> GetTagById([FromRoute] Guid id)
     {
-        // FAKED
-        return Result.Success(new GetTagResponse("Faked tag name 2"));
+        var tag = await _appDbContext.Tags
+            .AsNoTracking()
+            .Where(tag => tag.Id == id)
+            .FirstOrDefaultAsync();
+        
+        if (tag is null)
+        {
+            return Result.NotFound($"Tag with id {id} was not found");
+        }
+
+        return Result.Success(new GetTagResponse(tag.Name));
     }   
 
     [HttpPut]

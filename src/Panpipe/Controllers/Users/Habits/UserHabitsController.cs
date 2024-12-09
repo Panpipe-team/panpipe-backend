@@ -153,7 +153,6 @@ public class UserHabitsController(AppDbContext appDbContext, UserManager<AppIden
             }
 
             var tags = await _appDbContext.Tags
-                .AsNoTracking()
                 .Where(tag => request.Tags.Contains(tag.Id))
                 .ToListAsync();
 
