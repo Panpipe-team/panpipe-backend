@@ -47,7 +47,16 @@ public class GroupsController(AppDbContext dbContext, UserManager<AppIdentityUse
                 );
             }
 
-            participants.Add(new GetGroupResponseParticipant(userId, user.FullName));
+            var userName = user.UserName;
+
+            if (userName is null)
+            {
+                return Result.CriticalError(
+                    $"User with id {userId} does not have login"
+                );
+            }
+
+            participants.Add(new GetGroupResponseParticipant(userId, userName, user.FullName));
         }
 
         return Result.Success(new GetGroupResponse(group.Name, participants));
