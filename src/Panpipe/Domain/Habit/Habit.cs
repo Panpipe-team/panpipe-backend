@@ -1,14 +1,16 @@
 using Ardalis.Result;
+using Panpipe.Domain.HabitParamsSet;
 using Panpipe.Domain.HabitResult;
 
 namespace Panpipe.Domain.Habit;
 
-public class Habit(Guid id, Guid paramsSetId)
+public class Habit(Guid id, Guid paramsSetId, HabitType habitType)
 {
     private readonly List<HabitMark> marks = new ();
 
     public Guid Id { get; init; } = id;
     public Guid ParamsSetId { get; init; } = paramsSetId;
+    public HabitType HabitType { get; init; } = habitType;
 
     public ICollection<HabitMark> Marks => marks.AsReadOnly();
 

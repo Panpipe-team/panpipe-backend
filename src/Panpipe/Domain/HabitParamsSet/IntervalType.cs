@@ -6,3 +6,10 @@ public enum IntervalType
     Week,
     Month
 }
+
+public enum HabitType
+{
+    Sport,
+    Health,
+    SelfDevelopment
+}

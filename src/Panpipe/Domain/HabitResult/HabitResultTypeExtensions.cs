@@ -8,6 +8,8 @@ public static class HabitResultTypeExtensions
         {
             HabitResultType.Boolean => BooleanHabitResult.TryParse(s, out result),
             HabitResultType.Float => FloatHabitResult.TryParse(s, out result),
+            HabitResultType.Integer => IntegerHabitResult.TryParse(s, out result),
+            HabitResultType.Time => TimeHabitResult.TryParse(s, out result),
             _ => throw new NotImplementedException()
         };
     }

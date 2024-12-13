@@ -22,42 +22,48 @@ public static class AppDbContextSeed
                     $"Пройти {countSteps} шагов в день",
                     new IntegerHabitResult(Guid.NewGuid(), countSteps),
                     new Frequency(IntervalType.Day, 1),
-                    true
+                    true,
+                    HabitType.Sport
                 ),
                 new (
                     Guid.NewGuid(),
                     $"Спать {hoursSleep} часов в день",
                     new IntegerHabitResult(Guid.NewGuid(), hoursSleep),
                     new Frequency(IntervalType.Day, 1),
-                    true
+                    true,
+                    HabitType.Health
                 ),
                 new (
                     Guid.NewGuid(),
-                    $"Заниматься уроками английского языка {countEnglishLesson} раза в неделю",
-                    new IntegerHabitResult(Guid.NewGuid(), countEnglishLesson),
-                    new Frequency(IntervalType.Week, 3),
-                    true
+                    $"Заниматься уроками английского языка по 15 минут, каждые два дня",
+                    new TimeHabitResult(Guid.NewGuid(), new TimeSpan(0, 15, 0)),
+                    new Frequency(IntervalType.Day, 2),
+                    true,
+                    HabitType.SelfDevelopment
                 ),
                 new (
                     Guid.NewGuid(),
                     $"Прочитать {countPage} страниц в день",
                     new IntegerHabitResult(Guid.NewGuid(), countPage),
                     new Frequency(IntervalType.Day, 1),
-                    true
+                    true,
+                    HabitType.SelfDevelopment
                 ),
                 new (
                     Guid.NewGuid(),
                     $"Рабочая сессия без отвлечения {hoursJobSession} часов в день",
                     new IntegerHabitResult(Guid.NewGuid(), hoursJobSession),
                     new Frequency(IntervalType.Day, 1),
-                    true
+                    true,
+                    HabitType.SelfDevelopment
                 ),
                 new (
                     Guid.NewGuid(),
                     $"Потратить {spendCalories} калорий в день",
                     new FloatHabitResult(Guid.NewGuid(), spendCalories),
                     new Frequency(IntervalType.Day, 1),
-                    false
+                    false,
+                    HabitType.Health
                 ),
             }
         );
