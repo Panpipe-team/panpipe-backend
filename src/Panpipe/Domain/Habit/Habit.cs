@@ -1,5 +1,4 @@
 using Ardalis.Result;
-using Panpipe.Domain.HabitParamsSet;
 using Panpipe.Domain.HabitResult;
 
 namespace Panpipe.Domain.Habit;
