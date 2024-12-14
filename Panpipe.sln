@@ -9,6 +9,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{7ADE70DA
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Panpipe", "src\Panpipe\Panpipe.csproj", "{AA1A5851-3BF5-47F0-92ED-041E378D8AF5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Panpipe.Tests", "tests\Panpipe.Tests\Panpipe.Tests.csproj", "{7A57272A-13D9-4A03-AF24-144775715DF3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -19,12 +21,17 @@ Global
 		{AA1A5851-3BF5-47F0-92ED-041E378D8AF5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AA1A5851-3BF5-47F0-92ED-041E378D8AF5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AA1A5851-3BF5-47F0-92ED-041E378D8AF5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7A57272A-13D9-4A03-AF24-144775715DF3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7A57272A-13D9-4A03-AF24-144775715DF3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7A57272A-13D9-4A03-AF24-144775715DF3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7A57272A-13D9-4A03-AF24-144775715DF3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{AA1A5851-3BF5-47F0-92ED-041E378D8AF5} = {E1662F68-99BE-4A34-B696-411EBC31A234}
+		{7A57272A-13D9-4A03-AF24-144775715DF3} = {7ADE70DA-6A78-4F57-B6C8-6DD5AB46BFCD}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {0081F4D3-E4D4-40F5-B2BC-77A252F633DF}

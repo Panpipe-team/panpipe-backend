@@ -7,21 +7,14 @@ using Panpipe.Persistence.Identity;
 namespace Panpipe.Controllers.Auth;
 
 [ApiController]
-[Route("/api/v1")]
-public class AuthController: ControllerBase
+[Route("/api/v1.1")]
+public class AuthController(
+    UserManager<AppIdentityUser> userManager,
+    SignInManager<AppIdentityUser> signInManager
+) : ControllerBase
 {
-    private readonly UserManager<AppIdentityUser> _userManager;
-    private readonly SignInManager<AppIdentityUser> _signInManager;
-
-    public AuthController
-    (
-        UserManager<AppIdentityUser> userManager,
-        SignInManager<AppIdentityUser> signInManager
-    )
-    {
-        _userManager = userManager;
-        _signInManager = signInManager;
-    }
+    private readonly UserManager<AppIdentityUser> _userManager = userManager;
+    private readonly SignInManager<AppIdentityUser> _signInManager = signInManager;
 
     [HttpPost]
     [Route("register")]
@@ -36,7 +29,7 @@ public class AuthController: ControllerBase
             return Result.Conflict($"User with login \"{username}\" already exists");
         }
 
-        var user = new AppIdentityUser(username, null);
+        var user = new AppIdentityUser(username, request.Name);
 
         var result = await _userManager.CreateAsync(user, request.Password);
 

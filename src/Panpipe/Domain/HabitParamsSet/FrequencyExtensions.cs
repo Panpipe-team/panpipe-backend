@@ -32,14 +32,29 @@ public abstract class AbstractFrequencyEmptyMarksTimestampsCalculator(int interv
 {
     protected int IntervalValue { get; } = intervalValue;
     protected abstract int KeepMarksAheadAmount { get; }
+    protected virtual int CreateMarksBeforeCurrentAmount => KeepMarksAheadAmount;
 
     public List<DateTimeOffset> CalculateTimestampsOfEmptyMarksForNewlyCreatedHabit()
     {
-        var markTimestamps = new List<DateTimeOffset> { GetCurrentMarkTimestamp() };
+        var currentMarkTimestamp = GetCurrentMarkTimestamp();
+
+        var markTimestampsAfter = new List<DateTimeOffset> { currentMarkTimestamp };
 
         for (var i = 0; i < KeepMarksAheadAmount; i++) {
-            markTimestamps.Add(GetNextMarkTimestamp(markTimestamps[i]));
+            markTimestampsAfter.Add(GetNextMarkTimestamp(markTimestampsAfter[i]));
         };
+
+        var markTimestampsBefore = new List<DateTimeOffset> { currentMarkTimestamp };
+
+        for (var i = 0; i < CreateMarksBeforeCurrentAmount; i++) {
+            markTimestampsBefore.Add(GetPreviousMarkTimestamp(markTimestampsBefore[i]));
+        };
+
+        markTimestampsBefore.Reverse();
+        markTimestampsBefore.RemoveAt(markTimestampsBefore.Count - 1);
+
+        var markTimestamps = new List<DateTimeOffset> (markTimestampsBefore);
+        markTimestamps.AddRange(markTimestampsAfter);
 
         return markTimestamps;
     }
@@ -64,6 +79,7 @@ public abstract class AbstractFrequencyEmptyMarksTimestampsCalculator(int interv
 
     protected abstract DateTimeOffset GetCurrentMarkTimestamp();
     protected abstract DateTimeOffset GetNextMarkTimestamp(DateTimeOffset timestamp);
+    protected abstract DateTimeOffset GetPreviousMarkTimestamp(DateTimeOffset timestamp);
     protected abstract DateTimeOffset GetMaxAheadMarkTimestampsFromNow();
     protected abstract void ValidateMarkTimestamp(DateTimeOffset timestamp);
 }
@@ -84,6 +100,9 @@ public class DayFrequencyEmptyMarksTimestampsCalculator(int intervalValue):
 
     protected override DateTimeOffset GetNextMarkTimestamp(DateTimeOffset timestamp) 
         => timestamp.AddDays(IntervalValue);
+
+    protected override DateTimeOffset GetPreviousMarkTimestamp(DateTimeOffset timestamp)
+        => timestamp.AddDays(-IntervalValue);
 
     protected override void ValidateMarkTimestamp(DateTimeOffset timestamp)
     {
@@ -119,6 +138,9 @@ public class WeekFrequencyEmptyMarksTimestampsCalculator(int intervalValue):
     protected override DateTimeOffset GetNextMarkTimestamp(DateTimeOffset timestamp) 
         => timestamp.AddDays(IntervalValue * DaysInWeek);
 
+    protected override DateTimeOffset GetPreviousMarkTimestamp(DateTimeOffset timestamp)
+        => timestamp.AddDays(-IntervalValue * DaysInWeek);
+
     protected override void ValidateMarkTimestamp(DateTimeOffset timestamp)
     {
         EnsureDateTimeOffset.IsMondayMidnightUtc(timestamp);
@@ -146,7 +168,10 @@ public class MonthFrequencyEmptyMarksTimestampsCalculator(int intervalValue):
 
     protected override DateTimeOffset GetNextMarkTimestamp(DateTimeOffset timestamp)
         => timestamp.AddMonths(IntervalValue);
-
+    
+    protected override DateTimeOffset GetPreviousMarkTimestamp(DateTimeOffset timestamp)
+        => timestamp.AddMonths(-IntervalValue);
+    
     protected override void ValidateMarkTimestamp(DateTimeOffset timestamp)
     {
         EnsureDateTimeOffset.IsFirstDayOfMonthMidngihtUtc(timestamp);

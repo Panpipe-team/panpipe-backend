@@ -11,11 +11,11 @@ using Panpipe.Persistence.Identity;
 namespace Panpipe.Controllers.Groups;
 
 [ApiController]
-[Route("/api/v1/[controller]")]
+[Route("/api/v1.1/[controller]")]
 [Authorize]
 public class GroupsController(AppDbContext dbContext, UserManager<AppIdentityUser> userManager) : ControllerBase
 {
-    private readonly AppDbContext _dbContext = dbContext;
+    private readonly AppDbContext _appDbContext = dbContext;
     private readonly UserManager<AppIdentityUser> _userManager = userManager;
 
     [HttpGet]
@@ -23,7 +23,7 @@ public class GroupsController(AppDbContext dbContext, UserManager<AppIdentityUse
     [TranslateResultToActionResult]
     public async Task<Result<GetGroupResponse>> GetGroup([FromRoute] Guid id)
     {
-        var group = await _dbContext.Groups
+        var group = await _appDbContext.Groups
             .AsNoTracking()
             .Where(group => group.Id == id)
             .FirstOrDefaultAsync();
@@ -33,9 +33,33 @@ public class GroupsController(AppDbContext dbContext, UserManager<AppIdentityUse
             return Result.NotFound();
         }
 
-        return Result.Success(new GetGroupResponse(
-            group.Name, group.UserIds.Select(userId => new GetGroupResponseParticipant(userId)).ToList()
-        ));
+        var participants = new List<GetGroupResponseParticipant> ();
+
+        foreach (var userId in group.UserIds)
+        {
+            var user = await _userManager.FindByIdAsync(userId.ToString());
+
+            if (user is null)
+            {
+                return Result.CriticalError(
+                    $"Group with id {id} has participant with userId {userId}, " +
+                    "but user with this id cannot be found"
+                );
+            }
+
+            var userName = user.UserName;
+
+            if (userName is null)
+            {
+                return Result.CriticalError(
+                    $"User with id {userId} does not have login"
+                );
+            }
+
+            participants.Add(new GetGroupResponseParticipant(userId, userName, user.FullName));
+        }
+
+        return Result.Success(new GetGroupResponse(group.Name, participants));
     }
 
     [HttpGet]
@@ -49,7 +73,7 @@ public class GroupsController(AppDbContext dbContext, UserManager<AppIdentityUse
             return Result.Unauthorized("Cannot find authorized user by claim");
         }
 
-        var groups = await _dbContext.Groups
+        var groups = await _appDbContext.Groups
             .AsNoTracking()
             .Where(group => group.UserIds.Contains(user.Id))
             .ToListAsync();
@@ -70,11 +94,89 @@ public class GroupsController(AppDbContext dbContext, UserManager<AppIdentityUse
             return Result.Unauthorized("Cannot find authorized user by claim");
         }
 
-        var group = new Group(Guid.NewGuid(), request.Name, user.Id);
+        var participantIds = request.Participants.Select(participant => participant.UserId).ToList();
 
-        _dbContext.Groups.Add(group);
-        await _dbContext.SaveChangesAsync();
+        foreach (var participantId in participantIds)
+        {
+            var participant = await _userManager.FindByIdAsync(participantId.ToString());
+            if (participant is null)
+            {
+                return Result.Invalid(new ValidationError($"User with id {participantId} cannot be found"));
+            }
+        }
+
+        var group = new Group(
+            Guid.NewGuid(), 
+            request.Name, 
+            user.Id, 
+            participantIds
+        );
+
+        _appDbContext.Groups.Add(group);
+        await _appDbContext.SaveChangesAsync();
 
         return Result.Created(new CreateGroupResponse(group.Id));
     }
+
+    [HttpPost]
+    [Route("{groupId:guid}/participants")]
+    [TranslateResultToActionResult]
+    public async Task<Result> CreateGroupParticipant(
+        [FromRoute] Guid groupId, [FromBody] CreateGroupParticipantRequest request
+    )
+    {
+        var group = await _appDbContext.Groups
+            .Where(group => group.Id == groupId)
+            .FirstOrDefaultAsync();
+        
+        if (group is null)
+        {
+            return Result.Invalid(new ValidationError($"Group with id {groupId} was not found"));
+        }
+
+        var userId = request.UserId;
+
+        if (group.UserIds.Contains(userId))
+        {
+            return Result.Invalid(new ValidationError(
+                $"User with id {userId} is already participant of group with id {groupId}"
+            ));
+        }
+
+        group.AddUserId(userId);
+
+        await _appDbContext.SaveChangesAsync();
+        
+        return Result.Success();
+    }
+
+    [HttpDelete]
+    [Route("{groupId:guid}/participants")]
+    [TranslateResultToActionResult]
+    public async Task<Result> ExitGroup([FromRoute] Guid groupId)
+    {
+        var user = await _userManager.GetUserAsync(User);
+
+        if (user is null)
+        {
+            return Result.Unauthorized("Cannot find authorized user by claim");
+        }
+
+        var group = await _appDbContext.Groups
+            .Where(group => group.Id == groupId)
+            .FirstOrDefaultAsync();
+        
+        if (group is null)
+        {
+            return Result.Invalid(new ValidationError($"Group with id {groupId} was not found"));
+        }
+
+        group.RemoveUserId(user.Id);
+
+        await _appDbContext.SaveChangesAsync();
+
+        return Result.Success();
+    }
+
+    
 }

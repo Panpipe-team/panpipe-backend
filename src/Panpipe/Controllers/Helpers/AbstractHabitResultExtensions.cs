@@ -1,6 +1,6 @@
 using Panpipe.Domain.HabitResult;
 
-namespace Panpipe.Controllers.Habits.Helpers;
+namespace Panpipe.Controllers.Helpers;
 
 public static class AbstractHabitResultExtensions
 {

@@ -8,22 +8,16 @@ using Panpipe.Persistence.Identity;
 namespace Panpipe.Controllers.Users;
 
 [ApiController]
-[Route("/api/v1/[controller]")]
+[Route("/api/v1.1/[controller]")]
 [Authorize]
-public class UsersController: ControllerBase
+public class UsersController(UserManager<AppIdentityUser> userManager): ControllerBase
 {
-    private readonly UserManager<AppIdentityUser> _userManager;
-
-    public UsersController(UserManager<AppIdentityUser> userManager)
-    {
-        _userManager = userManager;
-    }
+    private readonly UserManager<AppIdentityUser> _userManager = userManager;
 
     [HttpGet]
     [Route("{id:guid}")]
-    [Authorize]
     [TranslateResultToActionResult]
-    public async Task<Result<GetUserResponse>> Get([FromRoute] Guid id)
+    public async Task<Result<GetUserByIdResponse>> GetById([FromRoute] Guid id)
     {
         var user = await _userManager.FindByIdAsync(id.ToString());
 
@@ -39,6 +33,20 @@ public class UsersController: ControllerBase
 
         var userName = user.UserName;
 
-        return Result.Success(user).Map(user => new GetUserResponse(userName));
+        return Result.Success(new GetUserByIdResponse(userName, user.FullName));
+    }
+
+    [HttpGet]
+    [TranslateResultToActionResult]
+    public async Task<Result<GetUserByLoginResponse>> GetByLogin([FromQuery] string login)
+    {
+        var result = await _userManager.FindByNameAsync(login);
+
+        if (result is null)
+        {
+            return Result.NotFound();
+        }
+
+        return Result.Success(new GetUserByLoginResponse(result.Id, result.FullName));
     }
 }
