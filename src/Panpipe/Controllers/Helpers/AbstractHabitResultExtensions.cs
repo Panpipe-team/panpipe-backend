@@ -10,6 +10,8 @@ public static class AbstractHabitResultExtensions
         {
             BooleanHabitResult booleanHabitResult => booleanHabitResult.Value.ToString(),
             FloatHabitResult floatHabitResult => floatHabitResult.Value.ToString(),
+            IntegerHabitResult integerHabitResult => integerHabitResult.Value.ToString(),
+            TimeHabitResult timeHabitResult => timeHabitResult.Value.ToString(),
             _ => throw new NotImplementedException()
         };
     }

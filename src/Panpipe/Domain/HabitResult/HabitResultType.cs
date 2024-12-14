@@ -3,5 +3,7 @@ namespace Panpipe.Domain.HabitResult;
 public enum HabitResultType
 {
     Boolean,
-    Float
+    Float,
+    Integer,
+    Time
 }
