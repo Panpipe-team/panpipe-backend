@@ -22,48 +22,42 @@ public static class AppDbContextSeed
                     $"Пройти {countSteps} шагов в день",
                     new IntegerHabitResult(Guid.NewGuid(), countSteps),
                     new Frequency(IntervalType.Day, 1),
-                    true,
-                    HabitType.Sport
+                    true
                 ),
                 new (
                     Guid.NewGuid(),
                     $"Спать {hoursSleep} часов в день",
                     new IntegerHabitResult(Guid.NewGuid(), hoursSleep),
                     new Frequency(IntervalType.Day, 1),
-                    true,
-                    HabitType.Health
+                    true
                 ),
                 new (
                     Guid.NewGuid(),
                     $"Заниматься уроками английского языка по 15 минут, каждые два дня",
                     new TimeHabitResult(Guid.NewGuid(), new TimeSpan(0, 15, 0)),
                     new Frequency(IntervalType.Day, 2),
-                    true,
-                    HabitType.SelfDevelopment
+                    true
                 ),
                 new (
                     Guid.NewGuid(),
                     $"Прочитать {countPage} страниц в день",
                     new IntegerHabitResult(Guid.NewGuid(), countPage),
                     new Frequency(IntervalType.Day, 1),
-                    true,
-                    HabitType.SelfDevelopment
+                    true
                 ),
                 new (
                     Guid.NewGuid(),
                     $"Рабочая сессия без отвлечения {hoursJobSession} часов в день",
                     new IntegerHabitResult(Guid.NewGuid(), hoursJobSession),
                     new Frequency(IntervalType.Day, 1),
-                    true,
-                    HabitType.SelfDevelopment
+                    true
                 ),
                 new (
                     Guid.NewGuid(),
                     $"Потратить {spendCalories} калорий в день",
                     new FloatHabitResult(Guid.NewGuid(), spendCalories),
                     new Frequency(IntervalType.Day, 1),
-                    false,
-                    HabitType.Health
+                    false
                 ),
             }
         );

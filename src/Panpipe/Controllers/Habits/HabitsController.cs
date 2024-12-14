@@ -38,8 +38,7 @@ public class HabitsController(AppDbContext appDbContext, UserManager<AppIdentity
                 template.Name, 
                 template.Frequency.ToReadableString(), 
                 template.Goal.ToReadableString(), 
-                template.ResultType.ToString(),
-                template.HabitType.ToReadableString()
+                template.ResultType.ToString()
             )
         ).ToList()));
     }
@@ -66,7 +65,6 @@ public class HabitsController(AppDbContext appDbContext, UserManager<AppIdentity
                     paramsSet.Frequency,
                     paramsSet.Goal,
                     paramsSet.ResultType,
-                    paramsSet.HabitType,
                     habit.Marks
                 }
             )
@@ -82,7 +80,6 @@ public class HabitsController(AppDbContext appDbContext, UserManager<AppIdentity
             result.Frequency.ToReadableString(),
             result.Goal.ToReadableString(),
             result.ResultType.ToString(),
-            result.HabitType.ToReadableString(),
             result.Marks.Select(mark => new GetHabitResponseMark(
                 mark.Id, 
                 mark.TimestampUtc.UtcDateTime,
@@ -127,8 +124,7 @@ public class HabitsController(AppDbContext appDbContext, UserManager<AppIdentity
                     paramsSet.Name,
                     paramsSet.Frequency,
                     paramsSet.Goal,
-                    paramsSet.ResultType,
-                    paramsSet.HabitType
+                    paramsSet.ResultType
                 }
             )
             .ToListAsync();
@@ -139,8 +135,7 @@ public class HabitsController(AppDbContext appDbContext, UserManager<AppIdentity
                 habitInfo.Name,
                 habitInfo.Frequency.ToReadableString(),
                 habitInfo.Goal.ToReadableString(),
-                habitInfo.ResultType.ToString(),
-                habitInfo.HabitType.ToReadableString()
+                habitInfo.ResultType.ToString()
             )).ToList()
         ));
     }
@@ -166,7 +161,7 @@ public class HabitsController(AppDbContext appDbContext, UserManager<AppIdentity
             return Result.Invalid(new ValidationError($"Not found habit params template with id {request.TemplateId}"));
         }
 
-        var habit = new Habit(Guid.NewGuid(), request.TemplateId, habitParamsSet.HabitType);
+        var habit = new Habit(Guid.NewGuid(), request.TemplateId);
 
         _appDbContext.Habits.Add(habit);
 

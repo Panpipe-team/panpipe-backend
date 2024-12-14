@@ -4,13 +4,12 @@ using Panpipe.Domain.HabitResult;
 
 namespace Panpipe.Domain.Habit;
 
-public class Habit(Guid id, Guid paramsSetId, HabitType habitType)
+public class Habit(Guid id, Guid paramsSetId)
 {
     private readonly List<HabitMark> marks = new ();
 
     public Guid Id { get; init; } = id;
     public Guid ParamsSetId { get; init; } = paramsSetId;
-    public HabitType HabitType { get; init; } = habitType;
 
     public ICollection<HabitMark> Marks => marks.AsReadOnly();
 
