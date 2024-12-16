@@ -4,6 +4,4 @@ public enum HabitResultType
 {
     Boolean,
     Float,
-    Integer,
-    Time
 }

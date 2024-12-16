@@ -54,16 +54,6 @@ public class AppDbContext(DbContextOptions options): DbContext(options)
         modelBuilder.Entity<FloatHabitResult>()
             .Property(x => x.Value)
             .IsRequired();
-
-        // IntegerHabitResult
-        modelBuilder.Entity<IntegerHabitResult>()
-            .Property(x => x.Value)
-            .IsRequired();
-        
-        // TimeHabitResult
-        modelBuilder.Entity<TimeHabitResult>()
-            .Property(x => x.Value)
-            .IsRequired();
         
         modelBuilder.Entity<FloatHabitResult>()
             .Property(x => x.Comment)
