@@ -62,7 +62,7 @@ public static class AppDbContextSeed
                     $"Проходи {stepsPerDay} шагов каждый день, чтобы оставаться активным и поддерживать здоровье. " +
                     "Этот простой шаг сделает тебя ближе к лучшей форме и самочувствию", 
                     [activityTag],
-                    new IntegerHabitResult(Guid.NewGuid(), stepsPerDay, EmptyHabitGoalComment),
+                    new FloatHabitResult(Guid.NewGuid(), stepsPerDay, EmptyHabitGoalComment),
                     new Frequency(IntervalType.Day, 1),
                     true
                 ),
@@ -74,7 +74,7 @@ public static class AppDbContextSeed
                     $"{englishLessonsDurationMinutesPerTwoDays} минут времени. " +
                     "Такой подход сделает процесс комфортным, а прогресс — заметным и стабильным.", 
                     [selfImprovementTag],
-                    new TimeHabitResult(Guid.NewGuid(), new TimeSpan(0, 15, 0), EmptyHabitGoalComment),
+                    new FloatHabitResult(Guid.NewGuid(), englishLessonsDurationMinutesPerTwoDays, EmptyHabitGoalComment),
                     new Frequency(IntervalType.Day, 2),
                     true
                 ),
