@@ -38,8 +38,25 @@ public class UsersController(UserManager<AppIdentityUser> userManager): Controll
 
     [HttpGet]
     [TranslateResultToActionResult]
-    public async Task<Result<GetUserByLoginResponse>> GetByLogin([FromQuery] string login)
+    public async Task<Result<GetUserResponse>> Get([FromQuery] string? login)
     {
+        if (login is null)
+        {
+            var user = await _userManager.GetUserAsync(User);
+
+            if (user is null)
+            {
+                return Result.Unauthorized("Cannot find authorized user by claim");
+            }
+
+            if (user.UserName is null)
+            {
+                return Result.CriticalError($"Current user does not have login");
+            }
+
+            return Result.Success(new GetUserResponse(user.Id, user.UserName, user.FullName));
+        }
+
         var result = await _userManager.FindByNameAsync(login);
 
         if (result is null)
@@ -47,6 +64,6 @@ public class UsersController(UserManager<AppIdentityUser> userManager): Controll
             return Result.NotFound();
         }
 
-        return Result.Success(new GetUserByLoginResponse(result.Id, result.FullName));
+        return Result.Success(new GetUserResponse(result.Id, login, result.FullName));
     }
 }

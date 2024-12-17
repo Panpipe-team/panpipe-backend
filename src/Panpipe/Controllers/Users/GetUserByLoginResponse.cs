@@ -1,3 +1,3 @@
 namespace Panpipe.Controllers.Users;
 
-public record GetUserByLoginResponse(Guid Id, string Name);
+public record GetUserResponse(Guid UserId, string Login, string Name);
