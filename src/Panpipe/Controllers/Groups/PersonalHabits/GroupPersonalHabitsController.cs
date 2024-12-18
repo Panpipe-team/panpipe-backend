@@ -151,10 +151,12 @@ public class GroupPersonalHabitsController(
             result.Goal.ToReadableString(),
             result.ResultType.ToString(),
             result.IsPublicTemplate,
-            marksDictionary.Select(timestampAndMarksPair => new GetGroupPersonalHabitResponseMark(
-                timestampAndMarksPair.Key.UtcDateTime,
-                timestampAndMarksPair.Value
-            )).ToList()
+            marksDictionary
+                .OrderBy(timestampAndMarksPair => timestampAndMarksPair.Key.UtcDateTime)
+                .Select(timestampAndMarksPair => new GetGroupPersonalHabitResponseMark(
+                    timestampAndMarksPair.Key.UtcDateTime,
+                    timestampAndMarksPair.Value
+                )).ToList()
         ));
     }
 
@@ -182,6 +184,11 @@ public class GroupPersonalHabitsController(
                 return Result.Invalid(new ValidationError(
                     "TemplateId from query and habit parameters in non-null body cannot be specified simultaneously"
                 ));
+            }
+
+            if (request.Name == "")
+            {
+                return Result.Invalid(new ValidationError("Habit name cannot be an empty string"));
             }
 
             var tags = await _appDbContext.Tags

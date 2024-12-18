@@ -114,13 +114,15 @@ public class GroupCommonHabitsController(
             result.Goal.ToReadableString(),
             result.ResultType.ToString(),
             result.IsPublicTemplate,
-            result.Marks.Select(mark => new GetGroupCommonHabitResponseMark(
-                mark.Id, 
-                mark.TimestampUtc.UtcDateTime,
-                mark.Result is null 
-                    ? null 
-                    : new GetGroupCommonHabitResponseResult_(mark.Result.ToReadableString(), mark.Result.Comment) 
-            )).ToList()
+            result.Marks
+                .OrderBy(mark => mark.TimestampUtc)
+                .Select(mark => new GetGroupCommonHabitResponseMark(
+                    mark.Id, 
+                    mark.TimestampUtc.UtcDateTime,
+                    mark.Result is null 
+                        ? null 
+                        : new GetGroupCommonHabitResponseResult_(mark.Result.ToReadableString(), mark.Result.Comment) 
+                )).ToList()
         ));
     }
 
@@ -141,6 +143,11 @@ public class GroupCommonHabitsController(
                 return Result.Invalid(new ValidationError(
                     "TemplateId from query and habit parameters in non-null body cannot be specified simultaneously"
                 ));
+            }
+
+            if (request.Name == "")
+            {
+                return Result.Invalid(new ValidationError("Habit name cannot be an empty string"));
             }
 
             var tags = await _appDbContext.Tags
