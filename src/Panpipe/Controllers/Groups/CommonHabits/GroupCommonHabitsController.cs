@@ -143,6 +143,11 @@ public class GroupCommonHabitsController(
                 ));
             }
 
+            if (request.Name == "")
+            {
+                return Result.Invalid(new ValidationError("Habit name cannot be an empty string"));
+            }
+
             var tags = await _appDbContext.Tags
                 .Where(tag => request.Tags.Contains(tag.Id))
                 .ToListAsync();
