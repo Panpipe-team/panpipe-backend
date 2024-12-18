@@ -118,13 +118,15 @@ public class UserHabitsController(AppDbContext appDbContext, UserManager<AppIden
             result.Goal.ToReadableString(),
             result.ResultType.ToString(),
             result.IsPublicTemplate,
-            result.Marks.Select(mark => new GetUserHabitByIdResponseMark(
-                mark.Id, 
-                mark.TimestampUtc.UtcDateTime,
-                mark.Result is null 
-                    ? null 
-                    : new GetUserHabitByIdResponseMarkResult(mark.Result.ToReadableString(), mark.Result.Comment) 
-            )).ToList()
+            result.Marks
+                .OrderBy(mark => mark.TimestampUtc)
+                .Select(mark => new GetUserHabitByIdResponseMark(
+                    mark.Id, 
+                    mark.TimestampUtc.UtcDateTime,
+                    mark.Result is null 
+                        ? null 
+                        : new GetUserHabitByIdResponseMarkResult(mark.Result.ToReadableString(), mark.Result.Comment) 
+                )).ToList()
         ));
     }
 

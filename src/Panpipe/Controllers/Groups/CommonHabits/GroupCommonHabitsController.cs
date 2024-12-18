@@ -114,13 +114,15 @@ public class GroupCommonHabitsController(
             result.Goal.ToReadableString(),
             result.ResultType.ToString(),
             result.IsPublicTemplate,
-            result.Marks.Select(mark => new GetGroupCommonHabitResponseMark(
-                mark.Id, 
-                mark.TimestampUtc.UtcDateTime,
-                mark.Result is null 
-                    ? null 
-                    : new GetGroupCommonHabitResponseResult_(mark.Result.ToReadableString(), mark.Result.Comment) 
-            )).ToList()
+            result.Marks
+                .OrderBy(mark => mark.TimestampUtc)
+                .Select(mark => new GetGroupCommonHabitResponseMark(
+                    mark.Id, 
+                    mark.TimestampUtc.UtcDateTime,
+                    mark.Result is null 
+                        ? null 
+                        : new GetGroupCommonHabitResponseResult_(mark.Result.ToReadableString(), mark.Result.Comment) 
+                )).ToList()
         ));
     }
 

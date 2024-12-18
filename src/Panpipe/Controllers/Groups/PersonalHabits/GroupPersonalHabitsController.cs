@@ -151,10 +151,12 @@ public class GroupPersonalHabitsController(
             result.Goal.ToReadableString(),
             result.ResultType.ToString(),
             result.IsPublicTemplate,
-            marksDictionary.Select(timestampAndMarksPair => new GetGroupPersonalHabitResponseMark(
-                timestampAndMarksPair.Key.UtcDateTime,
-                timestampAndMarksPair.Value
-            )).ToList()
+            marksDictionary
+                .OrderBy(timestampAndMarksPair => timestampAndMarksPair.Key.UtcDateTime)
+                .Select(timestampAndMarksPair => new GetGroupPersonalHabitResponseMark(
+                    timestampAndMarksPair.Key.UtcDateTime,
+                    timestampAndMarksPair.Value
+                )).ToList()
         ));
     }
 
